@@ -1,0 +1,151 @@
+<script type="text/html" data-template-name="hysteresis">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-mode"><i class="fa fa-wrench"></i> <span data-i18n="trigger.label.mode">Mode</span></label>
+    <select type="text" id="node-input-mode" style="width:70%;">
+        <option value="rising" data-i18n="trigger.opts.rising">Rising</option>
+        <option value="falling" data-i18n="trigger.opts.falling">Falling</option>
+        <option value="hysteresis" data-i18n="trigger.opts.hysteresis">Hysteresis</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-property"><i class="fa fa-ellipsis-h"></i> Property</label>
+    <input type="text" id="node-input-property">
+    <input type="hidden", id="node-input-propertyType">
+  </div>
+  <div class="form-row" id="node-thresholdRising">
+    <label for="node-input-thresholdRising"><i class="fa fa-level-up"></i> Threshold Rising</label>
+    <input type="text" id="node-input-thresholdRising">
+    <input type="hidden", id="node-input-thresholdRisingType">
+  </div>
+  <div class="form-row" id="node-thresholdFalling">
+    <label for="node-input-thresholdFalling"><i class="fa fa-level-down"></i>  Threshold Falling</label>
+    <input type="text" id="node-input-thresholdFalling">
+    <input type="hidden", id="node-input-thresholdFallingType">
+  </div>
+  <div class="form-row">
+    <label for="node-input-outputHigh"><i class="fa fa-level-up"></i> Output High</label>
+    <input type="text" id="node-input-outputHigh">
+    <input type="hidden", id="node-input-outputHighType">
+  </div>
+  <div class="form-row">
+    <label for="node-input-outputLow"><i class="fa fa-level-down"></i> Output Low</label>
+    <input type="text" id="node-input-outputLow">
+    <input type="hidden", id="node-input-outputLowType">
+  </div>
+</script>
+
+<script type="text/html" data-help-name="hysteresis">
+    <p>A node triggering on numeric value change.</p>
+</script>
+
+
+<script type="text/javascript">
+  RED.nodes.registerType('hysteresis', {
+    category: 'function',
+    color: '#E2D96E',
+    defaults: {
+      name: {value: ""},
+      mode: {value: "hysteresis"},
+      property: {value: "payload"},
+      propertyType: {value: "msg"},
+      thresholdRising: {
+        value: "0"
+        // validate: RED.validators.number()
+      },
+      thresholdRisingType: {value: "num"},
+      thresholdFalling: {
+        value: "0"
+        // validate: RED.validators.number()
+      },
+      thresholdFallingType: {value: "num"},
+      outputLow: {value: false},
+      outputLowType: {value: "bool"},
+      outputHigh: {value: true},
+      outputHighType: {value: "bool"}
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "hysteresis.png",
+    // icon: function () {
+    //   if ($("#node-input-mode").val() === "rising") {
+    //     return "rising-edge.png"
+    //   } else if ($("#node-input-mode").val() === "falling") {
+    //     return "hysteresis.png"
+    //   } else {
+    //     return "hysteresis.png"
+    //   }
+    // },
+    label: function () { return this.name || "hysteresis" },
+      // return (this.name !== undefined) ? this.name : "rising edge";
+      // return (this.name !== undefined) ? this.name : "hysteresis";
+        // : (
+        //   ($("#node-input-mode").val() === "rising") ? "rising edge"
+        //   : (
+        //     ($("#node-input-mode").val() === "falling") ? "falling edge"
+        //     : "hysteresis"
+        //   )
+        // );
+    // },
+    paletteLabel: "hysteresis",
+    oneditprepare: function() {
+      $("#node-input-mode").on("change", function() {
+        let trigger_mode = $("#node-input-mode").val()
+        if (trigger_mode === "rising") {
+          $("#node-thresholdRising").show();
+          $("#node-thresholdFalling").hide();
+        } else if (trigger_mode === "falling") {
+          $("#node-thresholdRising").hide();
+          $("#node-thresholdFalling").show();
+        } else {
+          $("#node-thresholdRising").show();
+          $("#node-thresholdFalling").show();
+        }
+      });
+
+      if (this.property === undefined) {
+        $("#node-input-property").val("payload");
+      }
+
+      $("#node-input-property").typedInput({
+        default: 'msg',
+        types: ['msg', 'flow', 'global', 'jsonata'],
+        typeField: $("#node-input-propertyType")
+      });
+
+      const thresholdTypes = ['num', 'flow', 'global', 'env', 'jsonata'];
+      $("#node-input-thresholdRising").typedInput({
+        default: 'num',
+        types: thresholdTypes,
+        typeField: $("#node-input-thresholdRisingType")
+      });
+      $("#node-input-thresholdFalling").typedInput({
+        default: 'num',
+        types: thresholdTypes,
+        typeField: $("#node-input-thresholdFallingType")
+      });
+
+      // if (this.outputLow === undefined) {
+      //   $("#node-input-outputLow").val("payload");
+      // }
+      // if (this.outputHigh === undefined) {
+      //   $("#node-input-outputHigh").val("payload");
+      // }
+
+      const outputTypes = ['bool', 'num', 'json', 'msg', 'flow', 'global', 'env', 'jsonata'];
+      $("#node-input-outputLow").typedInput({
+        default: 'bool',
+        types: outputTypes,
+        typeField: $("#node-input-outputLowType")
+      });
+      $("#node-input-outputHigh").typedInput({
+        default: 'bool',
+        types: outputTypes,
+        typeField: $("#node-input-outputHighType")
+      });
+    }
+  });
+</script>
