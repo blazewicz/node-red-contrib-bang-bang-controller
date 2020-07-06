@@ -4,14 +4,6 @@
     <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
-    <label for="node-input-mode"><i class="fa fa-wrench"></i> <span data-i18n="trigger.label.mode">Mode</span></label>
-    <select type="text" id="node-input-mode" style="width:70%;">
-        <option value="rising" data-i18n="trigger.opts.rising">Rising</option>
-        <option value="falling" data-i18n="trigger.opts.falling">Falling</option>
-        <option value="hysteresis" data-i18n="trigger.opts.hysteresis">Hysteresis</option>
-    </select>
-  </div>
-  <div class="form-row">
     <label for="node-input-property"><i class="fa fa-ellipsis-h"></i> Property</label>
     <input type="text" id="node-input-property">
     <input type="hidden", id="node-input-propertyType">
@@ -49,7 +41,6 @@
     color: '#E2D96E',
     defaults: {
       name: {value: ""},
-      mode: {value: "hysteresis"},
       property: {value: "payload"},
       propertyType: {value: "msg"},
       thresholdRising: {
@@ -73,20 +64,6 @@
     label: function () { return this.name || "hysteresis" },
     paletteLabel: "hysteresis",
     oneditprepare: function() {
-      $("#node-input-mode").on("change", function() {
-        let trigger_mode = $("#node-input-mode").val()
-        if (trigger_mode === "rising") {
-          $("#node-thresholdRising").show();
-          $("#node-thresholdFalling").hide();
-        } else if (trigger_mode === "falling") {
-          $("#node-thresholdRising").hide();
-          $("#node-thresholdFalling").show();
-        } else {
-          $("#node-thresholdRising").show();
-          $("#node-thresholdFalling").show();
-        }
-      });
-
       if (this.property === undefined) {
         $("#node-input-property").val("payload");
       }

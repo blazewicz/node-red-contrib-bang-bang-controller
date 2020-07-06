@@ -5,12 +5,10 @@ module.exports = function(RED) {
 
     node.state = "down";
 
-    // let mode = config.mode;
     // let thresholdRising = RED.util.evaluateNodeProperty(config.thresholdRising, config.thresholdRisingType, node);
     // let thresholdFalling = RED.util.evaluateNodeProperty(config.thresholdFalling, config.thresholdFallingType, node);
 
     // RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
-    //   mode: mode,
     //   thresholdRising: thresholdRising,
     //   thresholdFalling: thresholdFalling
     // })});
@@ -41,7 +39,6 @@ module.exports = function(RED) {
       let thresholdFallingValue = RED.util.evaluateNodeProperty(config.thresholdFalling, config.thresholdFallingType, node);
 
       RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
-        mode: mode,
         state: node.state,
         inputValue: current_value,
         thresholdRising: thresholdRisingValue,
@@ -49,24 +46,12 @@ module.exports = function(RED) {
       })});
 
       var stateChanged = false;
-      if (config.mode === "falling") {
-        if (node.state === "up" && current_value < thresholdFallingValue) {
-          stateChanged = true;
-          node.state = "down";
-        }
-      } else if (config.mode === "rising") {
-        if (node.state === "down" && current_value > thresholdRisingValue) {
-          stateChanged = true;
-          node.state = "up";
-        }
-      } else /* if (config.mode === "hysteresis") */ {
-        if (node.state === "up" && current_value < thresholdFallingValue) {
-          stateChanged = true;
-          node.state = "down";
-        } else if (node.state === "down" && current_value > thresholdRisingValue) {
-          stateChanged = true;
-          node.state = "up";
-        }
+      if (node.state === "up" && current_value < thresholdFallingValue) {
+        stateChanged = true;
+        node.state = "down";
+      } else if (node.state === "down" && current_value > thresholdRisingValue) {
+        stateChanged = true;
+        node.state = "up";
       }
 
       if (stateChanged) {
