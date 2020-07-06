@@ -1,3 +1,4 @@
+var assert = require('assert');
 var helper = require("node-red-node-test-helper");
 var Context = require("@node-red/runtime/lib/nodes/context");
 var hysteresisNode = require("../hysteresis/hysteresis.js");
@@ -151,9 +152,12 @@ describe('hysteresis node', function () {
 
 function testHysteresis(testNode, helperNode, done) {
   var c = 0;
+  var c0Flag, c1Flag, c2Flag;
   helperNode.on("input", function (msg) {
     try {
       if (c == 0) {
+        assert(!c0Flag, "repeated message 0");
+        c0Flag = true;
         // 1b. state changes to 'low', outputLow is sent
         msg.should.have.property('payload', false);
         testNode.should.have.property('state', 'low');
@@ -171,6 +175,8 @@ function testHysteresis(testNode, helperNode, done) {
           }
         }, 10);
       } else if (c == 1) {
+        assert(!c1Flag, "repeated message 1");
+        c1Flag = true;
         // 3b. state changes to 'high', outputHigh is sent
         msg.should.have.property('payload', true);
         testNode.should.have.property('state', 'high');
@@ -188,6 +194,8 @@ function testHysteresis(testNode, helperNode, done) {
           }
         }, 10);
       } else if (c == 2) {
+        assert(!c2Flag, "repeated message 2");
+        c2Flag = true;
         // 5b. state changes to 'low', outputLow is sent
         msg.should.have.property('payload', false);
         testNode.should.have.property('state', 'low');
