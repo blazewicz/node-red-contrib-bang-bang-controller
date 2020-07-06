@@ -31,6 +31,7 @@
   <div class="form-row">
     <label for="node-input-initialState"> Initial State</label>
     <select type="text" id="node-input-initialState" style="width:70%;">
+        <option value="undefined">Undefined</option>
         <option value="high">High</option>
         <option value="low">Low</option>
     </select>
@@ -66,7 +67,7 @@
       outputLowType: {value: "bool"},
       outputHigh: {value: true},
       outputHighType: {value: "bool"},
-      initialState: {value: "low"},
+      initialState: {value: "undefined"},
     },
     inputs: 1,
     outputs: 1,
