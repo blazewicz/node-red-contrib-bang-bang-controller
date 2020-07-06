@@ -85,7 +85,7 @@
         typeField: $("#node-input-propertyType")
       });
 
-      const thresholdTypes = ['num', 'flow', 'global', 'env', 'jsonata'];
+      const thresholdTypes = ['flow', 'global', 'num', 'env', 'jsonata'];
       $("#node-input-thresholdRising").typedInput({
         default: 'num',
         types: thresholdTypes,
@@ -97,7 +97,7 @@
         typeField: $("#node-input-thresholdFallingType")
       });
 
-      const outputTypes = ['bool', 'num', 'json', 'msg', 'flow', 'global', 'env', 'jsonata'];
+      const outputTypes = ['msg', 'flow', 'global', 'str', 'num', 'bool', 'json', 'bin', 'jsonata', 'env'];
       $("#node-input-outputLow").typedInput({
         default: 'bool',
         types: outputTypes,
