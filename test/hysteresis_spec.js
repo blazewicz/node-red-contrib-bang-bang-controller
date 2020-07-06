@@ -48,119 +48,61 @@ describe('hysteresis node', function () {
     });
   });
 
-  it('should be able to set thresholds to numbers', function (done) {
-    var flow = [
-      { id: "n1", type: "hysteresis", name: "hysteresisNode", thresholdRising: 10, thresholdFalling: 8, wires: [["n2"]] },
-      { id: "n2", type: "helper" }
-    ];
-    helper.load(hysteresisNode, flow, function () {
-      var n1 = helper.getNode("n1");
-      var n2 = helper.getNode("n2");
+  describe('set thresholds', function () {
+    it('should be able to set thresholds to numbers', function (done) {
+      var flow = [
+        { id: "n1", type: "hysteresis", name: "hysteresisNode", thresholdRising: 10, thresholdFalling: 8, wires: [["n2"]] },
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(hysteresisNode, flow, function () {
+        var n1 = helper.getNode("n1");
+        var n2 = helper.getNode("n2");
 
-      n1.should.have.property('thresholdRising', 10);
-      n1.should.have.property('thresholdRisingType', 'num');
-      n1.should.have.property('thresholdFalling', 8);
-      n1.should.have.property('thresholdFallingType', 'num');
+        n1.should.have.property('thresholdRising', 10);
+        n1.should.have.property('thresholdRisingType', 'num');
+        n1.should.have.property('thresholdFalling', 8);
+        n1.should.have.property('thresholdFallingType', 'num');
 
-      testHysteresis(n1, n2, done);
+        testHysteresis(n1, n2, done);
+      });
     });
-  });
 
-  it('should be able to set thresholds from flow context', function (done) {
-    let flow = [
-      {
-        id: "n1",
-        type: "hysteresis",
-        name: "hysteresisNode",
-        thresholdRisingType: "flow",
-        thresholdRising: "th_high",
-        thresholdFallingType: "flow",
-        thresholdFalling: "th_low",
-        wires: [["n2"]],
-        "z": "flow"
-      },
-      { id: "n2", type: "helper" }
-    ];
-    helper.load(hysteresisNode, flow, function () {
-      let n1 = helper.getNode("n1");
-      let n2 = helper.getNode("n2");
-
-      n1.context().flow.set("th_low", 8);
-      n1.context().flow.set("th_high", 10);
-
-      testHysteresis(n1, n2, done);
-    });
-  });
-
-  it('should be able to set thresholds from global context', function (done) {
-    let flow = [
-      {
-        id: "n1",
-        type: "hysteresis",
-        name: "hysteresisNode",
-        thresholdRisingType: "global",
-        thresholdRising: "th_high",
-        thresholdFallingType: "global",
-        thresholdFalling: "th_low",
-        wires: [["n2"]]
-      },
-      { id: "n2", type: "helper" }
-    ];
-    helper.load(hysteresisNode, flow, function () {
-      let n1 = helper.getNode("n1");
-      let n2 = helper.getNode("n2");
-
-      n1.context().global.set("th_low", 8);
-      n1.context().global.set("th_high", 10);
-
-      testHysteresis(n1, n2, done);
-    });
-  });
-
-  it('should be able to set thresholds with JSONata', function (done) {
-    let flow = [
-      {
-        id: "n1",
-        type: "hysteresis",
-        name: "hysteresisNode",
-        thresholdRisingType: "jsonata",
-        thresholdRising: "$flowContext(\"th_low\") + 2",
-        thresholdFallingType: "flow",
-        thresholdFalling: "th_low",
-        wires: [["n2"]],
-        "z": "flow"
-      },
-      { id: "n2", type: "helper" }
-    ];
-    helper.load(hysteresisNode, flow, function () {
-      let n1 = helper.getNode("n1");
-      let n2 = helper.getNode("n2");
-
-      n1.context().flow.set("th_low", 8);
-
-      testHysteresis(n1, n2, done);
-    });
-  });
-
-  describe('env var', function () {
-    before(function() {
-      process.env.TH_HIGH = '10';
-      process.env.TH_LOW = '8';
-    });
-    after(function() {
-      delete process.env.TH_HIGH;
-      delete process.env.TH_LOW;
-    });
-    it('should be able to set thresholds from env', function (done) {
+    it('should be able to set thresholds from flow context', function (done) {
       let flow = [
         {
           id: "n1",
           type: "hysteresis",
           name: "hysteresisNode",
-          thresholdRisingType: "env",
-          thresholdRising: "TH_HIGH",
-          thresholdFallingType: "env",
-          thresholdFalling: "TH_LOW",
+          thresholdRisingType: "flow",
+          thresholdRising: "th_high",
+          thresholdFallingType: "flow",
+          thresholdFalling: "th_low",
+          wires: [["n2"]],
+          "z": "flow"
+        },
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(hysteresisNode, flow, function () {
+        let n1 = helper.getNode("n1");
+        let n2 = helper.getNode("n2");
+
+        n1.context().flow.set("th_low", 8);
+        n1.context().flow.set("th_high", 10);
+
+        testHysteresis(n1, n2, done);
+      });
+    });
+
+    it('should be able to set thresholds from global context', function (done) {
+      let flow = [
+        {
+          id: "n1",
+          type: "hysteresis",
+          name: "hysteresisNode",
+          thresholdRisingType: "global",
+          thresholdRising: "th_high",
+          thresholdFallingType: "global",
+          thresholdFalling: "th_low",
           wires: [["n2"]]
         },
         { id: "n2", type: "helper" }
@@ -169,169 +111,231 @@ describe('hysteresis node', function () {
         let n1 = helper.getNode("n1");
         let n2 = helper.getNode("n2");
 
+        n1.context().global.set("th_low", 8);
+        n1.context().global.set("th_high", 10);
+
         testHysteresis(n1, n2, done);
       });
     });
-  });
 
-  it('should be able to set output to msg property', function (done) {
-    let flow = [
-      {
-        id: "n1",
-        type: "hysteresis",
-        name: "hysteresisNode",
-        thresholdRising: 10,
-        thresholdFalling: 8,
-        outputHighType: "msg",
-        outputHigh: "prop1",
-        wires: [["n2"]]
-      },
-      { id: "n2", type: "helper" }
-    ];
-    helper.load(hysteresisNode, flow, function () {
-      let n1 = helper.getNode("n1");
-      let n2 = helper.getNode("n2");
+    it('should be able to set thresholds with JSONata', function (done) {
+      let flow = [
+        {
+          id: "n1",
+          type: "hysteresis",
+          name: "hysteresisNode",
+          thresholdRisingType: "jsonata",
+          thresholdRising: "$flowContext(\"th_low\") + 2",
+          thresholdFallingType: "flow",
+          thresholdFalling: "th_low",
+          wires: [["n2"]],
+          "z": "flow"
+        },
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(hysteresisNode, flow, function () {
+        let n1 = helper.getNode("n1");
+        let n2 = helper.getNode("n2");
 
-      n2.on("input", function (msg) {
-        try {
-          msg.should.have.property('payload', 'val1');
-          done();
-        } catch (err) {
-          done(err);
-        }
+        n1.context().flow.set("th_low", 8);
+
+        testHysteresis(n1, n2, done);
       });
+    });
 
-      n1.receive({payload: 11, prop1: 'val1'});
+    describe('env var', function () {
+      before(function() {
+        process.env.TH_HIGH = '10';
+        process.env.TH_LOW = '8';
+      });
+      after(function() {
+        delete process.env.TH_HIGH;
+        delete process.env.TH_LOW;
+      });
+      it('should be able to set thresholds from env', function (done) {
+        let flow = [
+          {
+            id: "n1",
+            type: "hysteresis",
+            name: "hysteresisNode",
+            thresholdRisingType: "env",
+            thresholdRising: "TH_HIGH",
+            thresholdFallingType: "env",
+            thresholdFalling: "TH_LOW",
+            wires: [["n2"]]
+          },
+          { id: "n2", type: "helper" }
+        ];
+        helper.load(hysteresisNode, flow, function () {
+          let n1 = helper.getNode("n1");
+          let n2 = helper.getNode("n2");
+
+          testHysteresis(n1, n2, done);
+        });
+      });
     });
   });
 
-  it('should be able to set output to flow variable', function (done) {
-    let flow = [
-      {
-        id: "n1",
-        type: "hysteresis",
-        name: "hysteresisNode",
-        thresholdRising: 10,
-        thresholdFalling: 8,
-        outputHighType: "flow",
-        outputHigh: "var1",
-        wires: [["n2"]],
-        "z": "flow"
-      },
-      { id: "n2", type: "helper" }
-    ];
-    helper.load(hysteresisNode, flow, function () {
-      let n1 = helper.getNode("n1");
-      let n2 = helper.getNode("n2");
+  describe('set outputs', function () {
+    it('should be able to set output to msg property', function (done) {
+      let flow = [
+        {
+          id: "n1",
+          type: "hysteresis",
+          name: "hysteresisNode",
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: "msg",
+          outputHigh: "prop1",
+          wires: [["n2"]]
+        },
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(hysteresisNode, flow, function () {
+        let n1 = helper.getNode("n1");
+        let n2 = helper.getNode("n2");
 
-      n1.context().flow.set("var1", "val1");
+        n2.on("input", function (msg) {
+          try {
+            msg.should.have.property('payload', 'val1');
+            done();
+          } catch (err) {
+            done(err);
+          }
+        });
 
-      n2.on("input", function (msg) {
-        try {
-          msg.should.have.property('payload', 'val1');
-          done();
-        } catch (err) {
-          done(err);
-        }
+        n1.receive({payload: 11, prop1: 'val1'});
       });
-
-      n1.receive({payload: 11});
     });
-  });
 
-  it('should be able to set output to global variable', function (done) {
-    let flow = [
-      {
-        id: "n1",
-        type: "hysteresis",
-        name: "hysteresisNode",
-        thresholdRising: 10,
-        thresholdFalling: 8,
-        outputHighType: "global",
-        outputHigh: "var1",
-        wires: [["n2"]]
-      },
-      { id: "n2", type: "helper" }
-    ];
-    helper.load(hysteresisNode, flow, function () {
-      let n1 = helper.getNode("n1");
-      let n2 = helper.getNode("n2");
+    it('should be able to set output to flow variable', function (done) {
+      let flow = [
+        {
+          id: "n1",
+          type: "hysteresis",
+          name: "hysteresisNode",
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: "flow",
+          outputHigh: "var1",
+          wires: [["n2"]],
+          "z": "flow"
+        },
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(hysteresisNode, flow, function () {
+        let n1 = helper.getNode("n1");
+        let n2 = helper.getNode("n2");
 
-      n1.context().global.set("var1", "val1");
+        n1.context().flow.set("var1", "val1");
 
-      n2.on("input", function (msg) {
-        try {
-          msg.should.have.property('payload', 'val1');
-          done();
-        } catch (err) {
-          done(err);
-        }
+        n2.on("input", function (msg) {
+          try {
+            msg.should.have.property('payload', 'val1');
+            done();
+          } catch (err) {
+            done(err);
+          }
+        });
+
+        n1.receive({payload: 11});
       });
-
-      n1.receive({payload: 11});
     });
-  });
 
-  it('should be able to set output to original message', function (done) {
-    let flow = [
-      {
-        id: "n1",
-        type: "hysteresis",
-        name: "hysteresisNode",
-        thresholdRising: 10,
-        thresholdFalling: 8,
-        outputHighType: "pay",
-        wires: [["n2"]]
-      },
-      { id: "n2", type: "helper" }
-    ];
-    helper.load(hysteresisNode, flow, function () {
-      let n1 = helper.getNode("n1");
-      let n2 = helper.getNode("n2");
+    it('should be able to set output to global variable', function (done) {
+      let flow = [
+        {
+          id: "n1",
+          type: "hysteresis",
+          name: "hysteresisNode",
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: "global",
+          outputHigh: "var1",
+          wires: [["n2"]]
+        },
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(hysteresisNode, flow, function () {
+        let n1 = helper.getNode("n1");
+        let n2 = helper.getNode("n2");
 
-      n2.on("input", function (msg) {
-        try {
-          msg.should.have.property('payload', 11);
-          msg.should.have.property('prop1', 'val1');
-          done();
-        } catch (err) {
-          done(err);
-        }
+        n1.context().global.set("var1", "val1");
+
+        n2.on("input", function (msg) {
+          try {
+            msg.should.have.property('payload', 'val1');
+            done();
+          } catch (err) {
+            done(err);
+          }
+        });
+
+        n1.receive({payload: 11});
       });
-
-      n1.receive({payload: 11, prop1: 'val1'});
     });
-  });
 
-  it('should be able to set output to nothing', function (done) {
-    let flow = [
-      {
-        id: "n1",
-        type: "hysteresis",
-        name: "hysteresisNode",
-        thresholdRising: 10,
-        thresholdFalling: 8,
-        outputHighType: "nul",
-        wires: [["n2"]]
-      },
-      { id: "n2", type: "helper" }
-    ];
-    helper.load(hysteresisNode, flow, function () {
-      let n1 = helper.getNode("n1");
-      let n2 = helper.getNode("n2");
+    it('should be able to set output to original message', function (done) {
+      let flow = [
+        {
+          id: "n1",
+          type: "hysteresis",
+          name: "hysteresisNode",
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: "pay",
+          wires: [["n2"]]
+        },
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(hysteresisNode, flow, function () {
+        let n1 = helper.getNode("n1");
+        let n2 = helper.getNode("n2");
 
-      n2.on("input", function (msg) {
-        try {
-          assert.fail("should not get a message");
-        } catch (err) {
-          done(err);
-        }
+        n2.on("input", function (msg) {
+          try {
+            msg.should.have.property('payload', 11);
+            msg.should.have.property('prop1', 'val1');
+            done();
+          } catch (err) {
+            done(err);
+          }
+        });
+
+        n1.receive({payload: 11, prop1: 'val1'});
       });
+    });
 
-      n1.receive({payload: 11});
-      setTimeout(function () {
-        done();
-      }, 10);
+    it('should be able to set output to nothing', function (done) {
+      let flow = [
+        {
+          id: "n1",
+          type: "hysteresis",
+          name: "hysteresisNode",
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: "nul",
+          wires: [["n2"]]
+        },
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(hysteresisNode, flow, function () {
+        let n1 = helper.getNode("n1");
+        let n2 = helper.getNode("n2");
+
+        n2.on("input", function (msg) {
+          try {
+            assert.fail("should not get a message");
+          } catch (err) {
+            done(err);
+          }
+        });
+
+        n1.receive({payload: 11});
+        setTimeout(function () {
+          done();
+        }, 10);
+      });
     });
   });
 });
