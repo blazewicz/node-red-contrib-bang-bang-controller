@@ -2,8 +2,7 @@ module.exports = function(RED) {
   function HysteresisNode(config) {
     RED.nodes.createNode(this, config);
     let node = this;
-
-    node.state = "down";
+    node.state = config.initialState;
 
     // let thresholdRising = RED.util.evaluateNodeProperty(config.thresholdRising, config.thresholdRisingType, node);
     // let thresholdFalling = RED.util.evaluateNodeProperty(config.thresholdFalling, config.thresholdFallingType, node);
