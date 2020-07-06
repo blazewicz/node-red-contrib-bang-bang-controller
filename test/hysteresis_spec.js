@@ -139,7 +139,7 @@ describe('hysteresis node', function () {
   });
 
   describe('set thresholds', function () {
-    it('should be able to set thresholds to numbers', function (done) {
+    it('should be able to set thresholds with numbers', function (done) {
       var flow = [
         { id: "n1", type: "hysteresis", name: "hysteresisNode", thresholdRising: 10, thresholdFalling: 8, wires: [["n2"]] },
         { id: "n2", type: "helper" }
