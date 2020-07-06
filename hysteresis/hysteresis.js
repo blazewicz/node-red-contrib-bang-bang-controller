@@ -5,15 +5,15 @@ module.exports = function(RED) {
 
     node.state = "down";
 
-    let mode = config.mode;
-    let thresholdRising = RED.util.evaluateNodeProperty(config.thresholdRising, config.thresholdRisingType, node);
-    let thresholdFalling = RED.util.evaluateNodeProperty(config.thresholdFalling, config.thresholdFallingType, node);
+    // let mode = config.mode;
+    // let thresholdRising = RED.util.evaluateNodeProperty(config.thresholdRising, config.thresholdRisingType, node);
+    // let thresholdFalling = RED.util.evaluateNodeProperty(config.thresholdFalling, config.thresholdFallingType, node);
 
-    RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
-      mode: mode,
-      thresholdRising: thresholdRising,
-      thresholdFalling: thresholdFalling
-    })});
+    // RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
+    //   mode: mode,
+    //   thresholdRising: thresholdRising,
+    //   thresholdFalling: thresholdFalling
+    // })});
 
     node.on('input', function(msg) {
       let property = config.property;
