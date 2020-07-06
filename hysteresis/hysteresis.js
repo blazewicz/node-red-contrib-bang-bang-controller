@@ -61,7 +61,7 @@ module.exports = function(RED) {
         if (node.state === "high") {
           payload = config.outputHigh;
           payloadType = config.outputHighType;
-        } else /* (node.state === "low") */ {
+        } else /* if (node.state === "low") */ {
           payload = config.outputLow;
           payloadType = config.outputLowType;
         }
