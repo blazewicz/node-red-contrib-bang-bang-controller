@@ -16,14 +16,22 @@ module.exports = function(RED) {
     // })});
 
     node.on('input', function(msg) {
-      let property = config.property;
+      let property;
       if (config.propertyType === "msg") {
+        // TODO: fix this "SyntaxError: JSON.parse"
         if (!msg.hasOwnProperty(config.property)) {
           RED.comms.publish("debug", {format: "error", msg: "Message has no property"})
+          return;
         }
-        property = RED.util.getMessageProperty(msg, config.property);
+        property = RED.util.evaluateNodeProperty(config.property, config.propertyType, node, msg);
+      } else if (config.propertyType === "jsonata") {
+        property = RED.util.evaluateNodeProperty(config.property, config.propertyType, node, msg);
+      } else {
+        // adding `msg` causes error
+        property = RED.util.evaluateNodeProperty(config.property, config.propertyType, node);
       }
-      let current_value = Number(RED.util.evaluateNodeProperty(property, config.propertyType, node));
+      // TODO: validate is number
+      let current_value = Number(property);
       if (isNaN(current_value)) {
         RED.comms.publish("debug", {format: "error", msg: "Not a number property"});
         return;
@@ -70,14 +78,15 @@ module.exports = function(RED) {
           payload = config.outputLow;
           payloadType = config.outputLowType;
         }
-        if (payloadType === "msg") {
-          payload = RED.util.getMessageProperty(msg, payload);
-          // payload = RED.util.evaluateNodeProperty(RED.util.getMessageProperty(msg, payload), payloadType, node, msg);
+
+        if (payloadType === "msg" || payloadType === "jsonata") {
+          payload = RED.util.evaluateNodeProperty(payload, payloadType, node, msg);
         } else {
-          // payload = RED.util.evaluateNodeProperty(payload, payloadType, node);
+          payload = RED.util.evaluateNodeProperty(payload, payloadType, node);
         }
+
         node.send(
-          {payload: RED.util.evaluateNodeProperty(payload, payloadType, node)}
+          {payload: payload}
         );
       }
     });
