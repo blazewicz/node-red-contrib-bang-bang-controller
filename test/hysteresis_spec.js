@@ -32,6 +32,15 @@ describe('hysteresis node', function () {
     });
   });
 
+  it('should be able to set initial state', function (done) {
+    var flow = [{ id: "n1", type: "hysteresis", name: "hysteresisNode", initialState: 'low' }];
+    helper.load(hysteresisNode, flow, function () {
+      var n1 = helper.getNode("n1");
+      n1.should.have.property('state', 'low');
+      done();
+    });
+  });
+
   it('should be able to set thresholds to numbers', function (done) {
     var flow = [
       { id: "n1", type: "hysteresis", name: "hysteresisNode", thresholdRising: 10, thresholdFalling: 8, wires: [["n2"]] },
