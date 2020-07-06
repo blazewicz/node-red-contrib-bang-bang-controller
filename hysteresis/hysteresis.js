@@ -11,14 +11,6 @@ module.exports = function(RED) {
 
     // TODO: send initial message
 
-    // let thresholdRising = RED.util.evaluateNodeProperty(config.thresholdRising, config.thresholdRisingType, node);
-    // let thresholdFalling = RED.util.evaluateNodeProperty(config.thresholdFalling, config.thresholdFallingType, node);
-
-    // RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
-    //   thresholdRising: thresholdRising,
-    //   thresholdFalling: thresholdFalling
-    // })});
-
     node.on('input', function(msg) {
       let property;
       if (config.propertyType === "msg") {
