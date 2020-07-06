@@ -12,22 +12,14 @@ module.exports = function(RED) {
     // TODO: send initial message
 
     node.on('input', function(msg) {
-      let property;
-      if (config.propertyType === "msg") {
-        // TODO: fix this "SyntaxError: JSON.parse"
-        if (!msg.hasOwnProperty(config.property)) {
-          RED.comms.publish("debug", {format: "error", msg: "Message has no property"})
-          return;
-        }
-        property = RED.util.evaluateNodeProperty(config.property, config.propertyType, node, msg);
-      } else if (config.propertyType === "jsonata") {
-        property = RED.util.evaluateNodeProperty(config.property, config.propertyType, node, msg);
-      } else {
-        // adding `msg` causes error
-        property = RED.util.evaluateNodeProperty(config.property, config.propertyType, node);
+      // TODO: fix this "SyntaxError: JSON.parse"
+      if (!msg.hasOwnProperty(config.property)) {
+        RED.comms.publish("debug", {format: "error", msg: "Message has no property"})
+        return;
       }
+      let propertyValue = RED.util.evaluateNodeProperty(config.property, config.propertyType, node, msg);
       // TODO: validate is number
-      let currentValue = Number(property);
+      let currentValue = Number(propertyValue);
       if (isNaN(currentValue)) {
         RED.comms.publish("debug", {format: "error", msg: "Not a number property"});
         return;
