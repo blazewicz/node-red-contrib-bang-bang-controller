@@ -46,20 +46,20 @@ module.exports = function(RED) {
       })});
 
       var stateChanged = false;
-      if (node.state === "up" && current_value < thresholdFallingValue) {
+      if (node.state === "high" && current_value < thresholdFallingValue) {
         stateChanged = true;
-        node.state = "down";
-      } else if (node.state === "down" && current_value > thresholdRisingValue) {
+        node.state = "low";
+      } else if (node.state === "low" && current_value > thresholdRisingValue) {
         stateChanged = true;
-        node.state = "up";
+        node.state = "high";
       }
 
       if (stateChanged) {
         let payload, payloadType;
-        if (node.state === "up") {
+        if (node.state === "high") {
           payload = config.outputHigh;
           payloadType = config.outputHighType;
-        } else /* (node.state === "down") */ {
+        } else /* (node.state === "low") */ {
           payload = config.outputLow;
           payloadType = config.outputLowType;
         }
