@@ -1,7 +1,7 @@
-var assert = require('assert');
-var helper = require("node-red-node-test-helper");
-var Context = require("@node-red/runtime/lib/nodes/context");
-var hysteresisNode = require("../hysteresis/hysteresis.js");
+const assert = require('assert');
+const helper = require("node-red-node-test-helper");
+const Context = require("@node-red/runtime/lib/nodes/context");
+const hysteresisNode = require("../hysteresis/hysteresis.js");
 
 describe('hysteresis node', function () {
 
