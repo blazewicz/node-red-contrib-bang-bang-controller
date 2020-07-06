@@ -117,6 +117,31 @@ describe('hysteresis node', function () {
     });
   });
 
+  it('should be able to set thresholds with JSONata', function (done) {
+    let flow = [
+      {
+        id: "n1",
+        type: "hysteresis",
+        name: "hysteresisNode",
+        thresholdRisingType: "jsonata",
+        thresholdRising: "$flowContext(\"th_low\") + 2",
+        thresholdFallingType: "flow",
+        thresholdFalling: "th_low",
+        wires: [["n2"]],
+        "z": "flow"
+      },
+      { id: "n2", type: "helper" }
+    ];
+    helper.load(hysteresisNode, flow, function () {
+      let n1 = helper.getNode("n1");
+      let n2 = helper.getNode("n2");
+
+      n1.context().flow.set("th_low", 8);
+
+      testHysteresis(n1, n2, done);
+    });
+  });
+
   describe('env var', function () {
     before(function() {
       process.env.TH_HIGH = '10';
