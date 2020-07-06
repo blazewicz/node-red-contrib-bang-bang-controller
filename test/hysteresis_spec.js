@@ -46,24 +46,7 @@ describe('hysteresis node', function () {
       n1.should.have.property('thresholdFalling', 8);
       n1.should.have.property('thresholdFallingType', 'num');
 
-      var c = 0;
-      n2.on("input", function (msg) {
-        try {
-          if (c == 0) {
-            msg.should.have.property('payload', false);
-            n1.should.have.property('state', 'low');
-            n1.receive({payload: 11});
-            c += 1;
-          } else if (c == 1) {
-            msg.should.have.property('payload', true);
-            n1.should.have.property('state', 'high');
-            done()
-          }
-        } catch (err) {
-          done(err);
-        }
-      });
-      n1.receive({payload: 7});
+      testHysteresis(n1, n2, done);
     });
   });
 
@@ -89,3 +72,56 @@ describe('hysteresis node', function () {
   //   });
   // });
 });
+
+function testHysteresis(testNode, helperNode, done) {
+  var c = 0;
+  helperNode.on("input", function (msg) {
+    try {
+      if (c == 0) {
+        // 1b. state changes to 'low', outputLow is sent
+        msg.should.have.property('payload', false);
+        testNode.should.have.property('state', 'low');
+        // 2a. send value in deadband
+        testNode.receive({payload: 9});
+        setTimeout(function() {
+          try {
+            // 2b. state does not change, no output is generated
+            testNode.should.have.property('state', 'low');
+            // 3a. send value above rising threshold
+            testNode.receive({payload: 11});
+            c += 1;
+          } catch (err) {
+            done(err);
+          }
+        }, 10);
+      } else if (c == 1) {
+        // 3b. state changes to 'high', outputHigh is sent
+        msg.should.have.property('payload', true);
+        testNode.should.have.property('state', 'high');
+        // 4a. send value in deadband
+        testNode.receive({payload: 9});
+        setTimeout(function() {
+          try {
+            // 4b. state does not change, no output is generated
+            testNode.should.have.property('state', 'high');
+            // 5a. send value below falling threshold
+            testNode.receive({payload: 7});
+            c += 1;
+          } catch (err) {
+            done(err);
+          }
+        }, 10);
+      } else if (c == 2) {
+        // 5b. state changes to 'low', outputLow is sent
+        msg.should.have.property('payload', false);
+        testNode.should.have.property('state', 'low');
+        // 6. done
+        done();
+      }
+    } catch (err) {
+      done(err);
+    }
+  });
+  // 1a. send value below falling threshold
+  testNode.receive({payload: 7});
+}
