@@ -1,5 +1,5 @@
 module.exports = function(RED) {
-  function HysteresisNode(config) {
+  function BangBangNode(config) {
     RED.nodes.createNode(this, config);
 
     this.property = config.property || 'payload';
@@ -87,5 +87,5 @@ module.exports = function(RED) {
     });
   }
 
-  RED.nodes.registerType('hysteresis', HysteresisNode);
+  RED.nodes.registerType('bang-bang', BangBangNode);
 }

@@ -1,20 +1,24 @@
 {
-    "name": "node-red-contrib-numeric-trigger",
+    "name": "node-red-contrib-bang-bang-controller",
     "version": "0.1.0",
     "author": "Krzysztof Blazewicz <blazewicz.krzysztof@gmail.com>",
-    "description": "A node triggering on numeric value change",
-    "repository": "blazewicz/node-red-contrib-numeric-trigger",
+    "description": "A bang-bang controller node with dynamic setpoints and outputs",
+    "repository": "blazewicz/node-red-contrib-bang-bang-controller",
     "keywords": [
         "node-red",
         "trigger",
-        "edge",
+        "deadband",
         "hysteresis",
-        "bandgap",
-        "deadband"
+        "thermostat",
+        "heating",
+        "cooling",
+        "bang-bang",
+        "controller",
+        "on-off"
     ],
     "node-red": {
         "nodes": {
-            "hysteresis": "hysteresis/hysteresis.js"
+            "bang-bang": "bang-bang/bang-bang.js"
         }
     },
     "scripts": {

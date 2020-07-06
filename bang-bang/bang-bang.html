@@ -1,4 +1,4 @@
-<script type="text/html" data-template-name="hysteresis">
+<script type="text/html" data-template-name="bang-bang">
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="name">
@@ -38,13 +38,13 @@
   </div>
 </script>
 
-<script type="text/html" data-help-name="hysteresis">
+<script type="text/html" data-help-name="bang-bang">
     <p>A node triggering on numeric value change.</p>
 </script>
 
 
 <script type="text/javascript">
-  RED.nodes.registerType('hysteresis', {
+  RED.nodes.registerType('bang-bang', {
     category: 'function',
     color: '#E2D96E',
     defaults: {
@@ -72,8 +72,8 @@
     inputs: 1,
     outputs: 1,
     icon: "hysteresis.png",
-    label: function () { return this.name || "hysteresis" },
-    paletteLabel: "hysteresis",
+    label: function () { return this.name || "bang-bang" },
+    paletteLabel: "bang-bang",
     oneditprepare: function() {
       if (this.property === undefined) {
         $("#node-input-property").val("payload");
