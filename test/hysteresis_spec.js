@@ -48,6 +48,96 @@ describe('hysteresis node', function () {
     });
   });
 
+  it('should handle number as a string', function (done) {
+    let flow = [
+      {
+        id: "n1",
+        type: "hysteresis",
+        name: "hysteresisNode",
+        thresholdRising: 10,
+        thresholdFalling: 8,
+        outputHighType: "msg",
+        outputHigh: "payload",
+        wires: [["n2"]]
+      },
+      { id: "n2", type: "helper" }
+    ];
+    helper.load(hysteresisNode, flow, function () {
+      let n1 = helper.getNode("n1");
+      let n2 = helper.getNode("n2");
+
+      n2.on("input", function (msg) {
+        try {
+          msg.should.have.property("payload", "11");
+          done();
+        } catch (err) {
+          done(err);
+        }
+      });
+
+      n1.receive({payload: "11"});
+    });
+  });
+
+  it('should report unparseable input', function (done) {
+    var flow = [{
+      id: "n1",
+      type: "hysteresis",
+      name: "hysteresisNode",
+      thresholdRising: 10,
+      thresholdFalling: 8,
+    }];
+    helper.load(hysteresisNode, flow, function () {
+      var n1 = helper.getNode("n1");
+
+      n1.receive({payload: "foo"})
+      setTimeout(function () {
+        n1.error.should.be.calledWithExactly("Property is not a number");
+        done();
+      }, 10);
+    });
+  });
+
+  it('should report missing property', function (done) {
+    var flow = [{
+      id: "n1",
+      type: "hysteresis",
+      name: "hysteresisNode",
+      property: "value",
+      thresholdRising: 10,
+      thresholdFalling: 8,
+    }];
+    helper.load(hysteresisNode, flow, function () {
+      var n1 = helper.getNode("n1");
+
+      n1.receive({payload: 11})
+      setTimeout(function () {
+        n1.error.should.be.calledWithExactly("Message has no property ...");
+        done();
+      }, 10);
+    });
+  });
+
+  it('should report invalid JSONata', function (done) {
+    var flow = [{
+      id: "n1",
+      type: "hysteresis",
+      name: "hysteresisNode",
+      thresholdRisingType: "jsonata",
+      thresholdRising: "$.payload +",
+      thresholdFalling: 8,
+    }];
+    helper.load(hysteresisNode, flow, function () {
+      var n1 = helper.getNode("n1");
+
+      n1.receive({payload: 11})
+      setTimeout(function () {
+        n1.error.should.been.calledWithMatch(/Invalid expression used as threshold: .+/);
+        done();
+      }, 10);
+    });
+  });
+
   describe('set thresholds', function () {
     it('should be able to set thresholds to numbers', function (done) {
       var flow = [
