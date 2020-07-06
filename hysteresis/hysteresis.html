@@ -97,8 +97,12 @@
         typeField: $("#node-input-thresholdFallingType")
       });
 
+      const optionPayload = { value: "pay", label: "original message", hasValue: false };
       const optionNothing = { value: "nul", label: "nothing", hasValue: false };
-      const outputTypes = ['msg', 'flow', 'global', 'str', 'num', 'bool', 'json', 'bin', 'jsonata', 'env', optionNothing];
+      const outputTypes = ['msg', 'flow', 'global', 'str', 'num', 'bool', 'json', 'bin', 'jsonata', 'env',
+        optionPayload,
+        optionNothing
+      ];
       $("#node-input-outputLow").typedInput({
         default: 'bool',
         types: outputTypes,

@@ -70,6 +70,8 @@ module.exports = function(RED) {
 
         if (payloadType === "nul") {
           msgOut = null;
+        } else if (payloadType === "pay") {
+          msgOut = msg;
         } else if (payloadType === "msg" || payloadType === "jsonata") {
           msgOut = {payload: RED.util.evaluateNodeProperty(payload, payloadType, node, msg)};
         } else {
