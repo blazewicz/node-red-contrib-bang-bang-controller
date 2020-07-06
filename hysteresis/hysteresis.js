@@ -26,14 +26,14 @@ module.exports = function(RED) {
     this.on('input', function(msg) {
       // TODO: fix this "SyntaxError: JSON.parse"
       if (!msg.hasOwnProperty(node.property)) {
-        RED.comms.publish("debug", {format: "error", msg: "Message has no property"})
+        node.error("Message has no property ...")
         return;
       }
       let propertyValue = RED.util.evaluateNodeProperty(node.property, node.propertyType, node, msg);
-      // TODO: validate is number
+      // TODO: better validation if property is a number
       let currentValue = Number(propertyValue);
       if (isNaN(currentValue)) {
-        RED.comms.publish("debug", {format: "error", msg: "Not a number property"});
+        node.error("Property is not a number")
         return;
       }
 
