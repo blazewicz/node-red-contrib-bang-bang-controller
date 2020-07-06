@@ -97,7 +97,8 @@
         typeField: $("#node-input-thresholdFallingType")
       });
 
-      const outputTypes = ['msg', 'flow', 'global', 'str', 'num', 'bool', 'json', 'bin', 'jsonata', 'env'];
+      const optionNothing = { value: "nul", label: "nothing", hasValue: false };
+      const outputTypes = ['msg', 'flow', 'global', 'str', 'num', 'bool', 'json', 'bin', 'jsonata', 'env', optionNothing];
       $("#node-input-outputLow").typedInput({
         default: 'bool',
         types: outputTypes,

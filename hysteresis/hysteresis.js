@@ -69,15 +69,15 @@ module.exports = function(RED) {
           payloadType = node.outputLowType;
         }
 
-        if (payloadType === "msg" || payloadType === "jsonata") {
-          payload = RED.util.evaluateNodeProperty(payload, payloadType, node, msg);
+        if (payloadType === "nul") {
+          msgOut = null;
+        } else if (payloadType === "msg" || payloadType === "jsonata") {
+          msgOut = {payload: RED.util.evaluateNodeProperty(payload, payloadType, node, msg)};
         } else {
-          payload = RED.util.evaluateNodeProperty(payload, payloadType, node);
+          msgOut = {payload: RED.util.evaluateNodeProperty(payload, payloadType, node)};
         }
 
-        node.send(
-          {payload: payload}
-        );
+        node.send(msgOut);
       }
     });
   }
