@@ -3,6 +3,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     let node = this;
     node.state = config.initialState;
+    node.status({fill: (node.state == "high" ? "red" : "blue"), shape: "dot", text: node.state});
 
     // let thresholdRising = RED.util.evaluateNodeProperty(config.thresholdRising, config.thresholdRisingType, node);
     // let thresholdFalling = RED.util.evaluateNodeProperty(config.thresholdFalling, config.thresholdFallingType, node);
@@ -54,6 +55,8 @@ module.exports = function(RED) {
       }
 
       if (stateChanged) {
+        node.status({fill: (node.state == "high" ? "red" : "blue"), shape: "dot", text: node.state});
+
         let payload, payloadType;
         if (node.state === "high") {
           payload = config.outputHigh;
