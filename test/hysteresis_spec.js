@@ -148,6 +148,167 @@ describe('hysteresis node', function () {
       });
     });
   });
+
+  it('should be able to set output to msg property', function (done) {
+    let flow = [
+      {
+        id: "n1",
+        type: "hysteresis",
+        name: "hysteresisNode",
+        thresholdRising: 10,
+        thresholdFalling: 8,
+        outputHighType: "msg",
+        outputHigh: "prop1",
+        wires: [["n2"]]
+      },
+      { id: "n2", type: "helper" }
+    ];
+    helper.load(hysteresisNode, flow, function () {
+      let n1 = helper.getNode("n1");
+      let n2 = helper.getNode("n2");
+
+      n2.on("input", function (msg) {
+        try {
+          msg.should.have.property('payload', 'val1');
+          done();
+        } catch (err) {
+          done(err);
+        }
+      });
+
+      n1.receive({payload: 11, prop1: 'val1'});
+    });
+  });
+
+  it('should be able to set output to flow variable', function (done) {
+    let flow = [
+      {
+        id: "n1",
+        type: "hysteresis",
+        name: "hysteresisNode",
+        thresholdRising: 10,
+        thresholdFalling: 8,
+        outputHighType: "flow",
+        outputHigh: "var1",
+        wires: [["n2"]],
+        "z": "flow"
+      },
+      { id: "n2", type: "helper" }
+    ];
+    helper.load(hysteresisNode, flow, function () {
+      let n1 = helper.getNode("n1");
+      let n2 = helper.getNode("n2");
+
+      n1.context().flow.set("var1", "val1");
+
+      n2.on("input", function (msg) {
+        try {
+          msg.should.have.property('payload', 'val1');
+          done();
+        } catch (err) {
+          done(err);
+        }
+      });
+
+      n1.receive({payload: 11});
+    });
+  });
+
+  it('should be able to set output to global variable', function (done) {
+    let flow = [
+      {
+        id: "n1",
+        type: "hysteresis",
+        name: "hysteresisNode",
+        thresholdRising: 10,
+        thresholdFalling: 8,
+        outputHighType: "global",
+        outputHigh: "var1",
+        wires: [["n2"]]
+      },
+      { id: "n2", type: "helper" }
+    ];
+    helper.load(hysteresisNode, flow, function () {
+      let n1 = helper.getNode("n1");
+      let n2 = helper.getNode("n2");
+
+      n1.context().global.set("var1", "val1");
+
+      n2.on("input", function (msg) {
+        try {
+          msg.should.have.property('payload', 'val1');
+          done();
+        } catch (err) {
+          done(err);
+        }
+      });
+
+      n1.receive({payload: 11});
+    });
+  });
+
+  it('should be able to set output to original message', function (done) {
+    let flow = [
+      {
+        id: "n1",
+        type: "hysteresis",
+        name: "hysteresisNode",
+        thresholdRising: 10,
+        thresholdFalling: 8,
+        outputHighType: "pay",
+        wires: [["n2"]]
+      },
+      { id: "n2", type: "helper" }
+    ];
+    helper.load(hysteresisNode, flow, function () {
+      let n1 = helper.getNode("n1");
+      let n2 = helper.getNode("n2");
+
+      n2.on("input", function (msg) {
+        try {
+          msg.should.have.property('payload', 11);
+          msg.should.have.property('prop1', 'val1');
+          done();
+        } catch (err) {
+          done(err);
+        }
+      });
+
+      n1.receive({payload: 11, prop1: 'val1'});
+    });
+  });
+
+  it('should be able to set output to nothing', function (done) {
+    let flow = [
+      {
+        id: "n1",
+        type: "hysteresis",
+        name: "hysteresisNode",
+        thresholdRising: 10,
+        thresholdFalling: 8,
+        outputHighType: "nul",
+        wires: [["n2"]]
+      },
+      { id: "n2", type: "helper" }
+    ];
+    helper.load(hysteresisNode, flow, function () {
+      let n1 = helper.getNode("n1");
+      let n2 = helper.getNode("n2");
+
+      n2.on("input", function (msg) {
+        try {
+          assert.fail("should not get a message");
+        } catch (err) {
+          done(err);
+        }
+      });
+
+      n1.receive({payload: 11});
+      setTimeout(function () {
+        done();
+      }, 10);
+    });
+  });
 });
 
 function testHysteresis(testNode, helperNode, done) {
