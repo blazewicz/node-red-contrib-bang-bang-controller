@@ -1,4 +1,5 @@
 var helper = require("node-red-node-test-helper");
+var Context = require("@node-red/runtime/lib/nodes/context");
 var hysteresisNode = require("../hysteresis/hysteresis.js");
 
 describe('hysteresis node', function () {
@@ -7,9 +8,14 @@ describe('hysteresis node', function () {
     helper.startServer(done);
   });
 
-  afterEach(function (done) {
-    helper.unload();
-    helper.stopServer(done);
+  afterEach(function(done) {
+    helper.unload().then(function () {
+        return Context.clean({allNodes: {}});
+    }).then(function () {
+        return Context.close();
+    }).then(function () {
+        helper.stopServer(done);
+    });
   });
 
   it('should be loaded with correct defaults', function (done) {
@@ -59,27 +65,88 @@ describe('hysteresis node', function () {
     });
   });
 
-  // it('should be able to set thresholds from flow context', function (done) {
-  //   var flow = [
-  //     {
-  //       id: "n1",
-  //       type: "hysteresis",
-  //       name: "hysteresisNode",
-  //       thresholdRisingType: "flow",
-  //       thresholdRising: "th_high",
-  //       thresholdFallingType: "flow",
-  //       thresholdFalling: "th_low"
-  //     }
-  //   ];
-  //   helper.load(hysteresisNode, flow, function () {
-  //     var n1 = helper.getNode("n1");
-  //
-  //     n1.should.have.property('thresholdRising', 'th_high');
-  //     n1.should.have.property('thresholdRisingType', 'flow');
-  //     n1.should.have.property('thresholdFalling', 'th_low');
-  //     n1.should.have.property('thresholdFallingType', 'flow');
-  //   });
-  // });
+  it('should be able to set thresholds from flow context', function (done) {
+    let flow = [
+      {
+        id: "n1",
+        type: "hysteresis",
+        name: "hysteresisNode",
+        thresholdRisingType: "flow",
+        thresholdRising: "th_high",
+        thresholdFallingType: "flow",
+        thresholdFalling: "th_low",
+        wires: [["n2"]],
+        "z": "flow"
+      },
+      { id: "n2", type: "helper" }
+    ];
+    helper.load(hysteresisNode, flow, function () {
+      let n1 = helper.getNode("n1");
+      let n2 = helper.getNode("n2");
+
+      n1.context().flow.set("th_low", 8);
+      n1.context().flow.set("th_high", 10);
+
+      testHysteresis(n1, n2, done);
+    });
+  });
+
+  it('should be able to set thresholds from global context', function (done) {
+    let flow = [
+      {
+        id: "n1",
+        type: "hysteresis",
+        name: "hysteresisNode",
+        thresholdRisingType: "global",
+        thresholdRising: "th_high",
+        thresholdFallingType: "global",
+        thresholdFalling: "th_low",
+        wires: [["n2"]]
+      },
+      { id: "n2", type: "helper" }
+    ];
+    helper.load(hysteresisNode, flow, function () {
+      let n1 = helper.getNode("n1");
+      let n2 = helper.getNode("n2");
+
+      n1.context().global.set("th_low", 8);
+      n1.context().global.set("th_high", 10);
+
+      testHysteresis(n1, n2, done);
+    });
+  });
+
+  describe('env var', function () {
+    before(function() {
+      process.env.TH_HIGH = '10';
+      process.env.TH_LOW = '8';
+    });
+    after(function() {
+      delete process.env.TH_HIGH;
+      delete process.env.TH_LOW;
+    });
+    it('should be able to set thresholds from env', function (done) {
+      let flow = [
+        {
+          id: "n1",
+          type: "hysteresis",
+          name: "hysteresisNode",
+          thresholdRisingType: "env",
+          thresholdRising: "TH_HIGH",
+          thresholdFallingType: "env",
+          thresholdFalling: "TH_LOW",
+          wires: [["n2"]]
+        },
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(hysteresisNode, flow, function () {
+        let n1 = helper.getNode("n1");
+        let n2 = helper.getNode("n2");
+
+        testHysteresis(n1, n2, done);
+      });
+    });
+  });
 });
 
 function testHysteresis(testNode, helperNode, done) {
