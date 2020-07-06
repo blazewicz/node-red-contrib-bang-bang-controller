@@ -29,8 +29,8 @@ module.exports = function(RED) {
         property = RED.util.evaluateNodeProperty(config.property, config.propertyType, node);
       }
       // TODO: validate is number
-      let current_value = Number(property);
-      if (isNaN(current_value)) {
+      let currentValue = Number(property);
+      if (isNaN(currentValue)) {
         RED.comms.publish("debug", {format: "error", msg: "Not a number property"});
         return;
       }
@@ -40,16 +40,16 @@ module.exports = function(RED) {
 
       RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
         state: node.state,
-        inputValue: current_value,
+        inputValue: currentValue,
         thresholdRising: thresholdRisingValue,
         thresholdFalling: thresholdFallingValue
       })});
 
       var stateChanged = false;
-      if (node.state === "high" && current_value < thresholdFallingValue) {
+      if (node.state === "low" && currentValue < thresholdFallingValue) {
         stateChanged = true;
         node.state = "low";
-      } else if (node.state === "low" && current_value > thresholdRisingValue) {
+      } else if (node.state === "high" && currentValue > thresholdRisingValue) {
         stateChanged = true;
         node.state = "high";
       }
