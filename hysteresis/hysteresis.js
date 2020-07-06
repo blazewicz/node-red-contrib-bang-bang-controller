@@ -24,7 +24,6 @@ module.exports = function(RED) {
 
     let node = this;
     this.on('input', function(msg) {
-      // TODO: fix this "SyntaxError: JSON.parse"
       if (!msg.hasOwnProperty(node.property)) {
         node.error("Message has no property ...")
         return;
@@ -37,8 +36,13 @@ module.exports = function(RED) {
         return;
       }
 
-      let thresholdRisingValue = RED.util.evaluateNodeProperty(node.thresholdRising, node.thresholdRisingType, node);
-      let thresholdFallingValue = RED.util.evaluateNodeProperty(node.thresholdFalling, node.thresholdFallingType, node);
+      let thresholdRisingValue, thresholdFallingValue;
+      try {
+        thresholdRisingValue = RED.util.evaluateNodeProperty(node.thresholdRising, node.thresholdRisingType, node);
+        thresholdFallingValue = RED.util.evaluateNodeProperty(node.thresholdFalling, node.thresholdFallingType, node);
+      } catch (err) {
+        node.error(`Invalid expression used as threshold: \"${err.message}\"`);
+      }
 
       RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
         state: node.state,
