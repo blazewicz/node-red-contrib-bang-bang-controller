@@ -5,11 +5,24 @@
     "description": "A node triggering on numeric value change",
     "repository": "blazewicz/node-red-contrib-numeric-trigger",
     "keywords": [
-        "node-red", "trigger", "edge", "hysteresis", "bandgap", "deadband"
+        "node-red",
+        "trigger",
+        "edge",
+        "hysteresis",
+        "bandgap",
+        "deadband"
     ],
     "node-red": {
         "nodes": {
             "hysteresis": "hysteresis/hysteresis.js"
         }
+    },
+    "scripts": {
+        "test": "mocha \"test/**/*_spec.js\""
+    },
+    "devDependencies": {
+        "mocha": "^8.0.1",
+        "node-red": "^1.1.0",
+        "node-red-node-test-helper": "^0.2.5"
     }
 }

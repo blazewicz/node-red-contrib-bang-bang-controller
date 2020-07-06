@@ -1,8 +1,21 @@
 module.exports = function(RED) {
   function HysteresisNode(config) {
     RED.nodes.createNode(this, config);
+
+    this.property = config.property || 'payload';
+    this.propertyType = config.propertyType || 'msg';
+    this.thresholdRising = config.thresholdRising;
+    this.thresholdRisingType = config.thresholdRisingType || 'num';
+    this.thresholdFalling = config.thresholdFalling;
+    this.thresholdFallingType = config.thresholdFallingType || 'num';
+    this.outputHigh = config.outputHigh || true;
+    this.outputHighType = config.outputHighType || 'bool';
+    this.outputLow = config.outputLow || false;
+    this.outputLowType = config.outputLowType || 'bool';
+    this.state = config.initialState || 'undefined';
+
     let node = this;
-    node.state = config.initialState;
+
     node.status({
       fill: (node.state === "undefined" ? "grey" : (node.state == "high" ? "red" : "blue")),
       shape: "dot",
@@ -13,11 +26,11 @@ module.exports = function(RED) {
 
     node.on('input', function(msg) {
       // TODO: fix this "SyntaxError: JSON.parse"
-      if (!msg.hasOwnProperty(config.property)) {
+      if (!msg.hasOwnProperty(node.property)) {
         RED.comms.publish("debug", {format: "error", msg: "Message has no property"})
         return;
       }
-      let propertyValue = RED.util.evaluateNodeProperty(config.property, config.propertyType, node, msg);
+      let propertyValue = RED.util.evaluateNodeProperty(node.property, node.propertyType, node, msg);
       // TODO: validate is number
       let currentValue = Number(propertyValue);
       if (isNaN(currentValue)) {
@@ -25,8 +38,8 @@ module.exports = function(RED) {
         return;
       }
 
-      let thresholdRisingValue = RED.util.evaluateNodeProperty(config.thresholdRising, config.thresholdRisingType, node);
-      let thresholdFallingValue = RED.util.evaluateNodeProperty(config.thresholdFalling, config.thresholdFallingType, node);
+      let thresholdRisingValue = RED.util.evaluateNodeProperty(node.thresholdRising, node.thresholdRisingType, node);
+      let thresholdFallingValue = RED.util.evaluateNodeProperty(node.thresholdFalling, node.thresholdFallingType, node);
 
       RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
         state: node.state,
@@ -49,11 +62,11 @@ module.exports = function(RED) {
 
         let payload, payloadType;
         if (node.state === "high") {
-          payload = config.outputHigh;
-          payloadType = config.outputHighType;
+          payload = node.outputHigh;
+          payloadType = node.outputHighType;
         } else /* if (node.state === "low") */ {
-          payload = config.outputLow;
-          payloadType = config.outputLowType;
+          payload = node.outputLow;
+          payloadType = node.outputLowType;
         }
 
         if (payloadType === "msg" || payloadType === "jsonata") {
