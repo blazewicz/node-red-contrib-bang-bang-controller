@@ -14,17 +14,16 @@ module.exports = function(RED) {
     this.outputLowType = config.outputLowType || 'bool';
     this.state = config.initialState || 'undefined';
 
-    let node = this;
-
-    node.status({
-      fill: (node.state === "undefined" ? "grey" : (node.state == "high" ? "red" : "blue")),
+    this.status({
+      fill: (this.state === "undefined" ? "grey" : (this.state == "high" ? "red" : "blue")),
       shape: "dot",
-      text: node.state
+      text: this.state
     });
 
     // TODO: send initial message
 
-    node.on('input', function(msg) {
+    let node = this;
+    this.on('input', function(msg) {
       // TODO: fix this "SyntaxError: JSON.parse"
       if (!msg.hasOwnProperty(node.property)) {
         RED.comms.publish("debug", {format: "error", msg: "Message has no property"})
