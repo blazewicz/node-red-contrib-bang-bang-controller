@@ -1,27 +1,36 @@
 module.exports = function (RED) {
-  function BangBangNode (config) {
-    RED.nodes.createNode(this, config)
+  class BangBangNode {
+    constructor (config) {
+      RED.nodes.createNode(this, config)
 
-    this.property = config.property || 'payload'
-    this.propertyType = config.propertyType || 'msg'
-    this.thresholdRising = config.thresholdRising
-    this.thresholdRisingType = config.thresholdRisingType || 'num'
-    this.thresholdFalling = config.thresholdFalling
-    this.thresholdFallingType = config.thresholdFallingType || 'num'
-    this.outputHigh = config.outputHigh || true
-    this.outputHighType = config.outputHighType || 'bool'
-    this.outputLow = config.outputLow || false
-    this.outputLowType = config.outputLowType || 'bool'
-    this.state = config.initialState || 'undefined'
+      this.property = config.property || 'payload'
+      this.propertyType = config.propertyType || 'msg'
+      this.thresholdRising = config.thresholdRising
+      this.thresholdRisingType = config.thresholdRisingType || 'num'
+      this.thresholdFalling = config.thresholdFalling
+      this.thresholdFallingType = config.thresholdFallingType || 'num'
+      this.outputHigh = config.outputHigh || true
+      this.outputHighType = config.outputHighType || 'bool'
+      this.outputLow = config.outputLow || false
+      this.outputLowType = config.outputLowType || 'bool'
+      this.state = config.initialState || 'undefined'
 
-    this.status({
-      fill: (this.state === 'undefined' ? 'grey' : (this.state === 'high' ? 'red' : 'blue')),
-      shape: 'dot',
-      text: this.state
-    })
+      this.on('input', this.onInput)
 
-    // TODO: send initial message
-    this.on('input', msg => {
+      this.init()
+    }
+
+    init () {
+      this.status({
+        fill: (this.state === 'undefined' ? 'grey' : (this.state === 'high' ? 'red' : 'blue')),
+        shape: 'dot',
+        text: this.state
+      })
+
+      // TODO: send initial message
+    }
+
+    onInput (msg) {
       const propertyValue = RED.util.getMessageProperty(msg, this.property)
       if (propertyValue === undefined) {
         // skip message with no payload property
@@ -84,7 +93,7 @@ module.exports = function (RED) {
 
         this.send(msgOut)
       }
-    })
+    }
   }
 
   RED.nodes.registerType('bang-bang', BangBangNode)
