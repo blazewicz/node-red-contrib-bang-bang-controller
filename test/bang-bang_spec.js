@@ -97,6 +97,38 @@ describe('bang-bang node', function () {
     })
   })
 
+  it('should handle nested message property', function (done) {
+    const flow = [
+      {
+        id: 'n1',
+        type: 'bang-bang',
+        name: 'bangbangNode',
+        property: 'payload.value',
+        thresholdRising: 10,
+        thresholdFalling: 8,
+        outputHighType: 'msg',
+        outputHigh: 'payload.value',
+        wires: [['n2']]
+      },
+      { id: 'n2', type: 'helper' }
+    ]
+    helper.load(bangbangNode, flow, function () {
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      n2.on('input', function (msg) {
+        try {
+          msg.should.have.property('payload', 11)
+          done()
+        } catch (err) {
+          done(err)
+        }
+      })
+
+      n1.receive({ payload: { value: 11 } })
+    })
+  })
+
   it('should report missing property', function (done) {
     var flow = [{
       id: 'n1',
@@ -111,7 +143,7 @@ describe('bang-bang node', function () {
 
       n1.receive({ payload: 11 })
       setTimeout(function () {
-        n1.error.should.be.calledWithExactly('Message has no property ...')
+        n1.error.should.be.calledWithExactly('Message has no property "value"')
         done()
       }, 10)
     })
