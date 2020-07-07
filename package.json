@@ -22,11 +22,18 @@
         }
     },
     "scripts": {
+        "lint": "standard bang-bang/**/*.js test/**/*.js",
         "test": "mocha \"test/**/*_spec.js\""
     },
     "devDependencies": {
         "mocha": "^8.0.1",
         "node-red": "^1.1.0",
-        "node-red-node-test-helper": "^0.2.5"
+        "node-red-node-test-helper": "^0.2.5",
+        "standard": "^14.3.4"
+    },
+    "standard": {
+        "env": {
+            "mocha": true
+        }
     }
 }
