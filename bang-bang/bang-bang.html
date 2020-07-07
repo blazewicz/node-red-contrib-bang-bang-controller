@@ -39,7 +39,30 @@
 </script>
 
 <script type="text/html" data-help-name="bang-bang">
-    <p>A node triggering on numeric value change.</p>
+    <p>A bang-bang controller node.</p>
+
+    <h3>Inputs</h3>
+      <dl class="message-properties">
+        <dt>payload<span class="property-type">number | string</span></dt>
+        <dd>The input value, must be a parseable number. Other properites may also be used.</dd>
+      </dl>
+
+    <h3>Outputs</h3>
+      <dl class="message-properties">
+        <dt>payload<span class="property-type">any</span></dt>
+        <dd>One of two configured output values.</dd>
+      </dl>
+
+    <h3>Details</h3>
+      <p>Sends one of two programmed output values on state change.<p>
+      <p>State changes from <code>low</code> to <code>high</code> when received <code>payload</code> value is greater than Rising Threshold.
+      Similarly, transition from <code>high</code> to <code>low</code> occurs when <code>payload</code> value is less than Falling Threshold.</p>
+
+    <h3>References</h3>
+      <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control">Bang-bang control on Wikipedia</a></li>
+      </ul>
+
 </script>
 
 
