@@ -15,7 +15,7 @@ module.exports = function(RED) {
     this.state = config.initialState || 'undefined';
 
     this.status({
-      fill: (this.state === "undefined" ? "grey" : (this.state == "high" ? "red" : "blue")),
+      fill: (this.state === "undefined" ? "grey" : (this.state === "high" ? "red" : "blue")),
       shape: "dot",
       text: this.state
     });
@@ -72,6 +72,7 @@ module.exports = function(RED) {
           payloadType = node.outputLowType;
         }
 
+        let msgOut;
         if (payloadType === "nul") {
           msgOut = null;
         } else if (payloadType === "pay") {
