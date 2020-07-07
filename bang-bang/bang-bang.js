@@ -24,12 +24,12 @@ module.exports = function (RED) {
 
     const node = this
     this.on('input', function (msg) {
-      if (!Object.prototype.hasOwnProperty.call(msg, node.property)) {
-        node.error('Message has no property ...')
+      const propertyValue = RED.util.getMessageProperty(msg, node.property)
+      if (propertyValue === undefined) {
+        // skip message with no payload property
+        node.error(`Message has no property "${node.property}"`)
         return
       }
-      const propertyValue = RED.util.evaluateNodeProperty(node.property, node.propertyType, node, msg)
-      // TODO: better validation if property is a number
       const currentValue = Number(propertyValue)
       if (isNaN(currentValue)) {
         node.error('Property is not a number')
