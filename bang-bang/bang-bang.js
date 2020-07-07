@@ -44,12 +44,13 @@ module.exports = function(RED) {
         node.error(`Invalid expression used as threshold: \"${err.message}\"`);
       }
 
-      RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
-        state: node.state,
-        inputValue: currentValue,
-        thresholdRising: thresholdRisingValue,
-        thresholdFalling: thresholdFallingValue
-      })});
+      // TODO: debug/trace logging
+      // RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
+      //   state: node.state,
+      //   inputValue: currentValue,
+      //   thresholdRising: thresholdRisingValue,
+      //   thresholdFalling: thresholdFallingValue
+      // })});
 
       var stateChanged = false;
       if (node.state !== "low" && currentValue < thresholdFallingValue) {
