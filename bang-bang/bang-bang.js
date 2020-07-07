@@ -21,56 +21,54 @@ module.exports = function (RED) {
     })
 
     // TODO: send initial message
-
-    const node = this
-    this.on('input', function (msg) {
-      const propertyValue = RED.util.getMessageProperty(msg, node.property)
+    this.on('input', msg => {
+      const propertyValue = RED.util.getMessageProperty(msg, this.property)
       if (propertyValue === undefined) {
         // skip message with no payload property
-        node.error(`Message has no property "${node.property}"`)
+        this.error(`Message has no property "${this.property}"`)
         return
       }
       const currentValue = Number(propertyValue)
       if (isNaN(currentValue)) {
-        node.error('Property is not a number')
+        this.error('Property is not a number')
         return
       }
 
       let thresholdRisingValue, thresholdFallingValue
       try {
-        thresholdRisingValue = RED.util.evaluateNodeProperty(node.thresholdRising, node.thresholdRisingType, node)
-        thresholdFallingValue = RED.util.evaluateNodeProperty(node.thresholdFalling, node.thresholdFallingType, node)
+        thresholdRisingValue = RED.util.evaluateNodeProperty(this.thresholdRising, this.thresholdRisingType, this)
+        thresholdFallingValue = RED.util.evaluateNodeProperty(this.thresholdFalling, this.thresholdFallingType, this)
       } catch (err) {
-        node.error(`Invalid expression used as threshold: "${err.message}"`)
+        this.error(`Invalid expression used as threshold: "${err.message}"`)
       }
 
       // TODO: debug/trace logging
       // RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
-      //   state: node.state,
+      //   state: this.state,
       //   inputValue: currentValue,
       //   thresholdRising: thresholdRisingValue,
       //   thresholdFalling: thresholdFallingValue
       // })});
 
       var stateChanged = false
-      if (node.state !== 'low' && currentValue < thresholdFallingValue) {
+      if (this.state !== 'low' && currentValue < thresholdFallingValue) {
         stateChanged = true
-        node.state = 'low'
-      } else if (node.state !== 'high' && currentValue > thresholdRisingValue) {
+        this.state = 'low'
+      } else if (this.state !== 'high' && currentValue > thresholdRisingValue) {
         stateChanged = true
-        node.state = 'high'
+        this.state = 'high'
       }
 
       if (stateChanged) {
-        node.status({ fill: (node.state === 'high' ? 'red' : 'blue'), shape: 'dot', text: node.state })
+        this.status({ fill: (this.state === 'high' ? 'red' : 'blue'), shape: 'dot', text: this.state })
 
         let payload, payloadType
-        if (node.state === 'high') {
-          payload = node.outputHigh
-          payloadType = node.outputHighType
-        } else /* if (node.state === "low") */ {
-          payload = node.outputLow
-          payloadType = node.outputLowType
+        if (this.state === 'high') {
+          payload = this.outputHigh
+          payloadType = this.outputHighType
+        } else /* if (this.state === "low") */ {
+          payload = this.outputLow
+          payloadType = this.outputLowType
         }
 
         let msgOut
@@ -79,12 +77,12 @@ module.exports = function (RED) {
         } else if (payloadType === 'pay') {
           msgOut = msg
         } else if (payloadType === 'msg' || payloadType === 'jsonata') {
-          msgOut = { payload: RED.util.evaluateNodeProperty(payload, payloadType, node, msg) }
+          msgOut = { payload: RED.util.evaluateNodeProperty(payload, payloadType, this, msg) }
         } else {
-          msgOut = { payload: RED.util.evaluateNodeProperty(payload, payloadType, node) }
+          msgOut = { payload: RED.util.evaluateNodeProperty(payload, payloadType, this) }
         }
 
-        node.send(msgOut)
+        this.send(msgOut)
       }
     })
   }

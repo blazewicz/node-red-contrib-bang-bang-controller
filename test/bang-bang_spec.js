@@ -3,24 +3,19 @@ const helper = require('node-red-node-test-helper')
 const Context = require('@node-red/runtime/lib/nodes/context')
 const bangbangNode = require('../bang-bang/bang-bang.js')
 
-describe('bang-bang node', function () {
-  beforeEach(function (done) {
-    helper.startServer(done)
+describe('bang-bang node', () => {
+  beforeEach(done => helper.startServer(done))
+
+  afterEach(done => {
+    helper.unload()
+      .then(() => Context.clean({ allNodes: {} }))
+      .then(() => Context.close())
+      .then(() => helper.stopServer(done))
   })
 
-  afterEach(function (done) {
-    helper.unload().then(function () {
-      return Context.clean({ allNodes: {} })
-    }).then(function () {
-      return Context.close()
-    }).then(function () {
-      helper.stopServer(done)
-    })
-  })
-
-  it('should be loaded with correct defaults', function (done) {
+  it('should be loaded with correct defaults', done => {
     var flow = [{ id: 'n1', type: 'bang-bang', name: 'bangbangNode' }]
-    helper.load(bangbangNode, flow, function () {
+    helper.load(bangbangNode, flow, () => {
       var n1 = helper.getNode('n1')
       n1.should.have.property('name', 'bangbangNode')
       n1.should.have.property('propertyType', 'msg')
@@ -38,16 +33,16 @@ describe('bang-bang node', function () {
     })
   })
 
-  it('should be able to set initial state', function (done) {
+  it('should be able to set initial state', done => {
     var flow = [{ id: 'n1', type: 'bang-bang', name: 'bangbangNode', initialState: 'low' }]
-    helper.load(bangbangNode, flow, function () {
+    helper.load(bangbangNode, flow, () => {
       var n1 = helper.getNode('n1')
       n1.should.have.property('state', 'low')
       done()
     })
   })
 
-  it('should handle number as a string', function (done) {
+  it('should handle number as a string', done => {
     const flow = [
       {
         id: 'n1',
@@ -61,11 +56,11 @@ describe('bang-bang node', function () {
       },
       { id: 'n2', type: 'helper' }
     ]
-    helper.load(bangbangNode, flow, function () {
+    helper.load(bangbangNode, flow, () => {
       const n1 = helper.getNode('n1')
       const n2 = helper.getNode('n2')
 
-      n2.on('input', function (msg) {
+      n2.on('input', msg => {
         try {
           msg.should.have.property('payload', '11')
           done()
@@ -78,7 +73,7 @@ describe('bang-bang node', function () {
     })
   })
 
-  it('should report unparseable input', function (done) {
+  it('should report unparseable input', done => {
     var flow = [{
       id: 'n1',
       type: 'bang-bang',
@@ -86,18 +81,18 @@ describe('bang-bang node', function () {
       thresholdRising: 10,
       thresholdFalling: 8
     }]
-    helper.load(bangbangNode, flow, function () {
+    helper.load(bangbangNode, flow, () => {
       var n1 = helper.getNode('n1')
 
       n1.receive({ payload: 'foo' })
-      setTimeout(function () {
+      setTimeout(() => {
         n1.error.should.be.calledWithExactly('Property is not a number')
         done()
       }, 10)
     })
   })
 
-  it('should handle nested message property', function (done) {
+  it('should handle nested message property', done => {
     const flow = [
       {
         id: 'n1',
@@ -112,11 +107,11 @@ describe('bang-bang node', function () {
       },
       { id: 'n2', type: 'helper' }
     ]
-    helper.load(bangbangNode, flow, function () {
+    helper.load(bangbangNode, flow, () => {
       const n1 = helper.getNode('n1')
       const n2 = helper.getNode('n2')
 
-      n2.on('input', function (msg) {
+      n2.on('input', msg => {
         try {
           msg.should.have.property('payload', 11)
           done()
@@ -129,7 +124,7 @@ describe('bang-bang node', function () {
     })
   })
 
-  it('should report missing property', function (done) {
+  it('should report missing property', done => {
     var flow = [{
       id: 'n1',
       type: 'bang-bang',
@@ -138,18 +133,18 @@ describe('bang-bang node', function () {
       thresholdRising: 10,
       thresholdFalling: 8
     }]
-    helper.load(bangbangNode, flow, function () {
+    helper.load(bangbangNode, flow, () => {
       var n1 = helper.getNode('n1')
 
       n1.receive({ payload: 11 })
-      setTimeout(function () {
+      setTimeout(() => {
         n1.error.should.be.calledWithExactly('Message has no property "value"')
         done()
       }, 10)
     })
   })
 
-  it('should report invalid JSONata', function (done) {
+  it('should report invalid JSONata', done => {
     var flow = [{
       id: 'n1',
       type: 'bang-bang',
@@ -158,24 +153,24 @@ describe('bang-bang node', function () {
       thresholdRising: '$.payload +',
       thresholdFalling: 8
     }]
-    helper.load(bangbangNode, flow, function () {
+    helper.load(bangbangNode, flow, () => {
       var n1 = helper.getNode('n1')
 
       n1.receive({ payload: 11 })
-      setTimeout(function () {
+      setTimeout(() => {
         n1.error.should.been.calledWithMatch(/Invalid expression used as threshold: .+/)
         done()
       }, 10)
     })
   })
 
-  describe('set thresholds', function () {
-    it('should be able to set thresholds with numbers', function (done) {
+  describe('set thresholds', () => {
+    it('should be able to set thresholds with numbers', done => {
       var flow = [
         { id: 'n1', type: 'bang-bang', name: 'bangbangNode', thresholdRising: 10, thresholdFalling: 8, wires: [['n2']] },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, function () {
+      helper.load(bangbangNode, flow, () => {
         var n1 = helper.getNode('n1')
         var n2 = helper.getNode('n2')
 
@@ -188,7 +183,7 @@ describe('bang-bang node', function () {
       })
     })
 
-    it('should be able to set thresholds from flow context', function (done) {
+    it('should be able to set thresholds from flow context', done => {
       const flow = [
         {
           id: 'n1',
@@ -203,7 +198,7 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, function () {
+      helper.load(bangbangNode, flow, () => {
         const n1 = helper.getNode('n1')
         const n2 = helper.getNode('n2')
 
@@ -214,7 +209,7 @@ describe('bang-bang node', function () {
       })
     })
 
-    it('should be able to set thresholds from global context', function (done) {
+    it('should be able to set thresholds from global context', done => {
       const flow = [
         {
           id: 'n1',
@@ -228,7 +223,7 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, function () {
+      helper.load(bangbangNode, flow, () => {
         const n1 = helper.getNode('n1')
         const n2 = helper.getNode('n2')
 
@@ -239,7 +234,7 @@ describe('bang-bang node', function () {
       })
     })
 
-    it('should be able to set thresholds with JSONata', function (done) {
+    it('should be able to set thresholds with JSONata', done => {
       const flow = [
         {
           id: 'n1',
@@ -254,7 +249,7 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, function () {
+      helper.load(bangbangNode, flow, () => {
         const n1 = helper.getNode('n1')
         const n2 = helper.getNode('n2')
 
@@ -264,16 +259,16 @@ describe('bang-bang node', function () {
       })
     })
 
-    describe('env var', function () {
-      before(function () {
+    describe('env var', () => {
+      before(() => {
         process.env.TH_HIGH = '10'
         process.env.TH_LOW = '8'
       })
-      after(function () {
+      after(() => {
         delete process.env.TH_HIGH
         delete process.env.TH_LOW
       })
-      it('should be able to set thresholds from env', function (done) {
+      it('should be able to set thresholds from env', done => {
         const flow = [
           {
             id: 'n1',
@@ -287,7 +282,7 @@ describe('bang-bang node', function () {
           },
           { id: 'n2', type: 'helper' }
         ]
-        helper.load(bangbangNode, flow, function () {
+        helper.load(bangbangNode, flow, () => {
           const n1 = helper.getNode('n1')
           const n2 = helper.getNode('n2')
 
@@ -297,8 +292,8 @@ describe('bang-bang node', function () {
     })
   })
 
-  describe('set outputs', function () {
-    it('should be able to set output to msg property', function (done) {
+  describe('set outputs', () => {
+    it('should be able to set output to msg property', done => {
       const flow = [
         {
           id: 'n1',
@@ -312,11 +307,11 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, function () {
+      helper.load(bangbangNode, flow, () => {
         const n1 = helper.getNode('n1')
         const n2 = helper.getNode('n2')
 
-        n2.on('input', function (msg) {
+        n2.on('input', msg => {
           try {
             msg.should.have.property('payload', 'val1')
             done()
@@ -329,7 +324,7 @@ describe('bang-bang node', function () {
       })
     })
 
-    it('should be able to set output to flow variable', function (done) {
+    it('should be able to set output to flow variable', done => {
       const flow = [
         {
           id: 'n1',
@@ -344,13 +339,13 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, function () {
+      helper.load(bangbangNode, flow, () => {
         const n1 = helper.getNode('n1')
         const n2 = helper.getNode('n2')
 
         n1.context().flow.set('var1', 'val1')
 
-        n2.on('input', function (msg) {
+        n2.on('input', msg => {
           try {
             msg.should.have.property('payload', 'val1')
             done()
@@ -363,7 +358,7 @@ describe('bang-bang node', function () {
       })
     })
 
-    it('should be able to set output to global variable', function (done) {
+    it('should be able to set output to global variable', done => {
       const flow = [
         {
           id: 'n1',
@@ -377,13 +372,13 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, function () {
+      helper.load(bangbangNode, flow, () => {
         const n1 = helper.getNode('n1')
         const n2 = helper.getNode('n2')
 
         n1.context().global.set('var1', 'val1')
 
-        n2.on('input', function (msg) {
+        n2.on('input', msg => {
           try {
             msg.should.have.property('payload', 'val1')
             done()
@@ -396,7 +391,7 @@ describe('bang-bang node', function () {
       })
     })
 
-    it('should be able to set output to original message', function (done) {
+    it('should be able to set output to original message', done => {
       const flow = [
         {
           id: 'n1',
@@ -409,11 +404,11 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, function () {
+      helper.load(bangbangNode, flow, () => {
         const n1 = helper.getNode('n1')
         const n2 = helper.getNode('n2')
 
-        n2.on('input', function (msg) {
+        n2.on('input', msg => {
           try {
             msg.should.have.property('payload', 11)
             msg.should.have.property('prop1', 'val1')
@@ -427,7 +422,7 @@ describe('bang-bang node', function () {
       })
     })
 
-    it('should be able to set output to nothing', function (done) {
+    it('should be able to set output to nothing', done => {
       const flow = [
         {
           id: 'n1',
@@ -440,11 +435,11 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, function () {
+      helper.load(bangbangNode, flow, () => {
         const n1 = helper.getNode('n1')
         const n2 = helper.getNode('n2')
 
-        n2.on('input', function (msg) {
+        n2.on('input', msg => {
           try {
             assert.fail('should not get a message')
           } catch (err) {
@@ -453,7 +448,7 @@ describe('bang-bang node', function () {
         })
 
         n1.receive({ payload: 11 })
-        setTimeout(function () {
+        setTimeout(() => {
           done()
         }, 10)
       })
@@ -464,7 +459,7 @@ describe('bang-bang node', function () {
 function testHysteresis (testNode, helperNode, done) {
   var c = 0
   var c0Flag, c1Flag, c2Flag
-  helperNode.on('input', function (msg) {
+  helperNode.on('input', msg => {
     try {
       if (c === 0) {
         assert(!c0Flag, 'repeated message 0')
@@ -474,7 +469,7 @@ function testHysteresis (testNode, helperNode, done) {
         testNode.should.have.property('state', 'low')
         // 2a. send value in deadband
         testNode.receive({ payload: 9 })
-        setTimeout(function () {
+        setTimeout(() => {
           try {
             // 2b. state does not change, no output is generated
             testNode.should.have.property('state', 'low')
@@ -493,7 +488,7 @@ function testHysteresis (testNode, helperNode, done) {
         testNode.should.have.property('state', 'high')
         // 4a. send value in deadband
         testNode.receive({ payload: 9 })
-        setTimeout(function () {
+        setTimeout(() => {
           try {
             // 4b. state does not change, no output is generated
             testNode.should.have.property('state', 'high')
