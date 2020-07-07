@@ -70,26 +70,7 @@
     inputs: 1,
     outputs: 1,
     icon: "hysteresis.png",
-    // icon: function () {
-    //   if ($("#node-input-mode").val() === "rising") {
-    //     return "rising-edge.png"
-    //   } else if ($("#node-input-mode").val() === "falling") {
-    //     return "hysteresis.png"
-    //   } else {
-    //     return "hysteresis.png"
-    //   }
-    // },
     label: function () { return this.name || "hysteresis" },
-      // return (this.name !== undefined) ? this.name : "rising edge";
-      // return (this.name !== undefined) ? this.name : "hysteresis";
-        // : (
-        //   ($("#node-input-mode").val() === "rising") ? "rising edge"
-        //   : (
-        //     ($("#node-input-mode").val() === "falling") ? "falling edge"
-        //     : "hysteresis"
-        //   )
-        // );
-    // },
     paletteLabel: "hysteresis",
     oneditprepare: function() {
       $("#node-input-mode").on("change", function() {
@@ -127,13 +108,6 @@
         types: thresholdTypes,
         typeField: $("#node-input-thresholdFallingType")
       });
-
-      // if (this.outputLow === undefined) {
-      //   $("#node-input-outputLow").val("payload");
-      // }
-      // if (this.outputHigh === undefined) {
-      //   $("#node-input-outputHigh").val("payload");
-      // }
 
       const outputTypes = ['bool', 'num', 'json', 'msg', 'flow', 'global', 'env', 'jsonata'];
       $("#node-input-outputLow").typedInput({
