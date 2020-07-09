@@ -3,17 +3,19 @@ const helper = require('node-red-node-test-helper')
 const Context = require('@node-red/runtime/lib/nodes/context')
 const bangbangNode = require('../bang-bang/bang-bang.js')
 
-describe('bang-bang node', () => {
-  beforeEach(done => helper.startServer(done))
+describe('bang-bang node', function () {
+  beforeEach(function (done) {
+    helper.startServer(done)
+  })
 
-  afterEach(done => {
+  afterEach(function (done) {
     helper.unload()
       .then(() => Context.clean({ allNodes: {} }))
       .then(() => Context.close())
       .then(() => helper.stopServer(done))
   })
 
-  it('should be loaded with correct defaults', done => {
+  it('should be loaded with correct defaults', function (done) {
     var flow = [{ id: 'n1', type: 'bang-bang', name: 'bangbangNode' }]
     helper.load(bangbangNode, flow, () => {
       var n1 = helper.getNode('n1')
@@ -33,7 +35,7 @@ describe('bang-bang node', () => {
     })
   })
 
-  it('should be able to set initial state', done => {
+  it('should be able to set initial state', function (done) {
     var flow = [{ id: 'n1', type: 'bang-bang', name: 'bangbangNode', initialState: 'low' }]
     helper.load(bangbangNode, flow, () => {
       var n1 = helper.getNode('n1')
@@ -42,7 +44,7 @@ describe('bang-bang node', () => {
     })
   })
 
-  it('should handle number as a string', done => {
+  it('should handle number as a string', function (done) {
     const flow = [
       {
         id: 'n1',
@@ -73,7 +75,7 @@ describe('bang-bang node', () => {
     })
   })
 
-  it('should report unparseable input', done => {
+  it('should report unparseable input', function (done) {
     var flow = [{
       id: 'n1',
       type: 'bang-bang',
@@ -92,7 +94,7 @@ describe('bang-bang node', () => {
     })
   })
 
-  it('should handle nested message property', done => {
+  it('should handle nested message property', function (done) {
     const flow = [
       {
         id: 'n1',
@@ -124,7 +126,7 @@ describe('bang-bang node', () => {
     })
   })
 
-  it('should report missing property', done => {
+  it('should report missing property', function (done) {
     var flow = [{
       id: 'n1',
       type: 'bang-bang',
@@ -144,7 +146,7 @@ describe('bang-bang node', () => {
     })
   })
 
-  it('should report invalid JSONata', done => {
+  it('should report invalid JSONata', function (done) {
     var flow = [{
       id: 'n1',
       type: 'bang-bang',
@@ -164,8 +166,8 @@ describe('bang-bang node', () => {
     })
   })
 
-  describe('set thresholds', () => {
-    it('should be able to set thresholds with numbers', done => {
+  describe('set thresholds', function () {
+    it('should be able to set thresholds with numbers', function (done) {
       var flow = [
         { id: 'n1', type: 'bang-bang', name: 'bangbangNode', thresholdRising: 10, thresholdFalling: 8, wires: [['n2']] },
         { id: 'n2', type: 'helper' }
@@ -183,7 +185,7 @@ describe('bang-bang node', () => {
       })
     })
 
-    it('should be able to set thresholds from flow context', done => {
+    it('should be able to set thresholds from flow context', function (done) {
       const flow = [
         {
           id: 'n1',
@@ -209,7 +211,7 @@ describe('bang-bang node', () => {
       })
     })
 
-    it('should be able to set thresholds from global context', done => {
+    it('should be able to set thresholds from global context', function (done) {
       const flow = [
         {
           id: 'n1',
@@ -234,7 +236,7 @@ describe('bang-bang node', () => {
       })
     })
 
-    it('should be able to set thresholds with JSONata', done => {
+    it('should be able to set thresholds with JSONata', function (done) {
       const flow = [
         {
           id: 'n1',
@@ -259,16 +261,16 @@ describe('bang-bang node', () => {
       })
     })
 
-    describe('env var', () => {
-      before(() => {
+    describe('env var', function () {
+      before(function () {
         process.env.TH_HIGH = '10'
         process.env.TH_LOW = '8'
       })
-      after(() => {
+      after(function () {
         delete process.env.TH_HIGH
         delete process.env.TH_LOW
       })
-      it('should be able to set thresholds from env', done => {
+      it('should be able to set thresholds from env', function (done) {
         const flow = [
           {
             id: 'n1',
@@ -292,8 +294,8 @@ describe('bang-bang node', () => {
     })
   })
 
-  describe('set outputs', () => {
-    it('should be able to set output to msg property', done => {
+  describe('set outputs', function () {
+    it('should be able to set output to msg property', function (done) {
       const flow = [
         {
           id: 'n1',
@@ -324,7 +326,7 @@ describe('bang-bang node', () => {
       })
     })
 
-    it('should be able to set output to flow variable', done => {
+    it('should be able to set output to flow variable', function (done) {
       const flow = [
         {
           id: 'n1',
@@ -358,7 +360,7 @@ describe('bang-bang node', () => {
       })
     })
 
-    it('should be able to set output to global variable', done => {
+    it('should be able to set output to global variable', function (done) {
       const flow = [
         {
           id: 'n1',
@@ -391,7 +393,7 @@ describe('bang-bang node', () => {
       })
     })
 
-    it('should be able to set output to original message', done => {
+    it('should be able to set output to original message', function (done) {
       const flow = [
         {
           id: 'n1',
@@ -422,7 +424,7 @@ describe('bang-bang node', () => {
       })
     })
 
-    it('should be able to set output to nothing', done => {
+    it('should be able to set output to nothing', function (done) {
       const flow = [
         {
           id: 'n1',
