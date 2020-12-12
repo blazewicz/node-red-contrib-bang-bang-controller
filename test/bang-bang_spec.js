@@ -16,9 +16,9 @@ describe('bang-bang node', function () {
   })
 
   it('should be loaded with correct defaults', function (done) {
-    var flow = [{ id: 'n1', type: 'bang-bang', name: 'bangbangNode' }]
+    const flow = [{ id: 'n1', type: 'bang-bang', name: 'bangbangNode' }]
     helper.load(bangbangNode, flow, () => {
-      var n1 = helper.getNode('n1')
+      const n1 = helper.getNode('n1')
       n1.should.have.property('name', 'bangbangNode')
       n1.should.have.property('propertyType', 'msg')
       n1.should.have.property('property', 'payload')
@@ -36,9 +36,9 @@ describe('bang-bang node', function () {
   })
 
   it('should be able to set initial state', function (done) {
-    var flow = [{ id: 'n1', type: 'bang-bang', name: 'bangbangNode', initialState: 'low' }]
+    const flow = [{ id: 'n1', type: 'bang-bang', name: 'bangbangNode', initialState: 'low' }]
     helper.load(bangbangNode, flow, () => {
-      var n1 = helper.getNode('n1')
+      const n1 = helper.getNode('n1')
       n1.should.have.property('state', 'low')
       done()
     })
@@ -76,7 +76,7 @@ describe('bang-bang node', function () {
   })
 
   it('should report unparseable input', function (done) {
-    var flow = [{
+    const flow = [{
       id: 'n1',
       type: 'bang-bang',
       name: 'bangbangNode',
@@ -84,7 +84,7 @@ describe('bang-bang node', function () {
       thresholdFalling: 8
     }]
     helper.load(bangbangNode, flow, () => {
-      var n1 = helper.getNode('n1')
+      const n1 = helper.getNode('n1')
 
       n1.receive({ payload: 'foo' })
       setTimeout(() => {
@@ -127,7 +127,7 @@ describe('bang-bang node', function () {
   })
 
   it('should report missing property', function (done) {
-    var flow = [{
+    const flow = [{
       id: 'n1',
       type: 'bang-bang',
       name: 'bangbangNode',
@@ -136,7 +136,7 @@ describe('bang-bang node', function () {
       thresholdFalling: 8
     }]
     helper.load(bangbangNode, flow, () => {
-      var n1 = helper.getNode('n1')
+      const n1 = helper.getNode('n1')
 
       n1.receive({ payload: 11 })
       setTimeout(() => {
@@ -147,7 +147,7 @@ describe('bang-bang node', function () {
   })
 
   it('should report invalid JSONata', function (done) {
-    var flow = [{
+    const flow = [{
       id: 'n1',
       type: 'bang-bang',
       name: 'bangbangNode',
@@ -156,7 +156,7 @@ describe('bang-bang node', function () {
       thresholdFalling: 8
     }]
     helper.load(bangbangNode, flow, () => {
-      var n1 = helper.getNode('n1')
+      const n1 = helper.getNode('n1')
 
       n1.receive({ payload: 11 })
       setTimeout(() => {
@@ -167,25 +167,27 @@ describe('bang-bang node', function () {
   })
 
   describe('set thresholds', function () {
-    it('should be able to set thresholds with numbers', function (done) {
-      var flow = [
+    it('should be able to set thresholds with numbers', function () {
+      const flow = [
         { id: 'n1', type: 'bang-bang', name: 'bangbangNode', thresholdRising: 10, thresholdFalling: 8, wires: [['n2']] },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, () => {
-        var n1 = helper.getNode('n1')
-        var n2 = helper.getNode('n2')
+      return new Promise((resolve, reject) => {
+        helper.load(bangbangNode, flow, () => {
+          const n1 = helper.getNode('n1')
+          const n2 = helper.getNode('n2')
 
-        n1.should.have.property('thresholdRising', 10)
-        n1.should.have.property('thresholdRisingType', 'num')
-        n1.should.have.property('thresholdFalling', 8)
-        n1.should.have.property('thresholdFallingType', 'num')
+          n1.should.have.property('thresholdRising', 10)
+          n1.should.have.property('thresholdRisingType', 'num')
+          n1.should.have.property('thresholdFalling', 8)
+          n1.should.have.property('thresholdFallingType', 'num')
 
-        testHysteresis(n1, n2, done)
+          resolve(testHysteresisAsync(n1, n2))
+        })
       })
     })
 
-    it('should be able to set thresholds from flow context', function (done) {
+    it('should be able to set thresholds from flow context', function () {
       const flow = [
         {
           id: 'n1',
@@ -200,18 +202,20 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, () => {
-        const n1 = helper.getNode('n1')
-        const n2 = helper.getNode('n2')
+      return new Promise((resolve, reject) => {
+        helper.load(bangbangNode, flow, () => {
+          const n1 = helper.getNode('n1')
+          const n2 = helper.getNode('n2')
 
-        n1.context().flow.set('th_low', 8)
-        n1.context().flow.set('th_high', 10)
+          n1.context().flow.set('th_low', 8)
+          n1.context().flow.set('th_high', 10)
 
-        testHysteresis(n1, n2, done)
+          resolve(testHysteresisAsync(n1, n2))
+        })
       })
     })
 
-    it('should be able to set thresholds from global context', function (done) {
+    it('should be able to set thresholds from global context', function () {
       const flow = [
         {
           id: 'n1',
@@ -225,18 +229,20 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, () => {
-        const n1 = helper.getNode('n1')
-        const n2 = helper.getNode('n2')
+      return new Promise((resolve, reject) => {
+        helper.load(bangbangNode, flow, () => {
+          const n1 = helper.getNode('n1')
+          const n2 = helper.getNode('n2')
 
-        n1.context().global.set('th_low', 8)
-        n1.context().global.set('th_high', 10)
+          n1.context().global.set('th_low', 8)
+          n1.context().global.set('th_high', 10)
 
-        testHysteresis(n1, n2, done)
+          resolve(testHysteresisAsync(n1, n2))
+        })
       })
     })
 
-    it('should be able to set thresholds with JSONata', function (done) {
+    it('should be able to set thresholds with JSONata', function () {
       const flow = [
         {
           id: 'n1',
@@ -251,13 +257,15 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, () => {
-        const n1 = helper.getNode('n1')
-        const n2 = helper.getNode('n2')
+      return new Promise((resolve, reject) => {
+        helper.load(bangbangNode, flow, () => {
+          const n1 = helper.getNode('n1')
+          const n2 = helper.getNode('n2')
 
-        n1.context().flow.set('th_low', 8)
+          n1.context().flow.set('th_low', 8)
 
-        testHysteresis(n1, n2, done)
+          resolve(testHysteresisAsync(n1, n2))
+        })
       })
     })
 
@@ -270,7 +278,7 @@ describe('bang-bang node', function () {
         delete process.env.TH_HIGH
         delete process.env.TH_LOW
       })
-      it('should be able to set thresholds from env', function (done) {
+      it('should be able to set thresholds from env', function () {
         const flow = [
           {
             id: 'n1',
@@ -284,11 +292,13 @@ describe('bang-bang node', function () {
           },
           { id: 'n2', type: 'helper' }
         ]
-        helper.load(bangbangNode, flow, () => {
-          const n1 = helper.getNode('n1')
-          const n2 = helper.getNode('n2')
+        return new Promise((resolve, reject) => {
+          helper.load(bangbangNode, flow, () => {
+            const n1 = helper.getNode('n1')
+            const n2 = helper.getNode('n2')
 
-          testHysteresis(n1, n2, done)
+            resolve(testHysteresisAsync(n1, n2))
+          })
         })
       })
     })
@@ -424,7 +434,7 @@ describe('bang-bang node', function () {
       })
     })
 
-    it('should be able to set output to nothing', function (done) {
+    it('should be able to set output to nothing', function () {
       const flow = [
         {
           id: 'n1',
@@ -437,83 +447,48 @@ describe('bang-bang node', function () {
         },
         { id: 'n2', type: 'helper' }
       ]
-      helper.load(bangbangNode, flow, () => {
-        const n1 = helper.getNode('n1')
-        const n2 = helper.getNode('n2')
+      return new Promise((resolve, reject) => {
+        helper.load(bangbangNode, flow, () => {
+          const n1 = helper.getNode('n1')
+          const n2 = helper.getNode('n2')
 
-        n2.on('input', msg => {
-          try {
-            assert.fail('should not get a message')
-          } catch (err) {
-            done(err)
-          }
+          resolve(promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout'))
         })
-
-        n1.receive({ payload: 11 })
-        setTimeout(() => {
-          done()
-        }, 10)
       })
     })
   })
 })
 
-function testHysteresis (testNode, helperNode, done) {
-  var c = 0
-  var c0Flag, c1Flag, c2Flag
-  helperNode.on('input', msg => {
-    try {
-      if (c === 0) {
-        assert(!c0Flag, 'repeated message 0')
-        c0Flag = true
-        // 1b. state changes to 'low', outputLow is sent
-        msg.should.have.property('payload', false)
-        testNode.should.have.property('state', 'low')
-        // 2a. send value in deadband
-        testNode.receive({ payload: 9 })
-        setTimeout(() => {
-          try {
-            // 2b. state does not change, no output is generated
-            testNode.should.have.property('state', 'low')
-            // 3a. send value above rising threshold
-            testNode.receive({ payload: 11 })
-            c += 1
-          } catch (err) {
-            done(err)
-          }
-        }, 10)
-      } else if (c === 1) {
-        assert(!c1Flag, 'repeated message 1')
-        c1Flag = true
-        // 3b. state changes to 'high', outputHigh is sent
-        msg.should.have.property('payload', true)
-        testNode.should.have.property('state', 'high')
-        // 4a. send value in deadband
-        testNode.receive({ payload: 9 })
-        setTimeout(() => {
-          try {
-            // 4b. state does not change, no output is generated
-            testNode.should.have.property('state', 'high')
-            // 5a. send value below falling threshold
-            testNode.receive({ payload: 7 })
-            c += 1
-          } catch (err) {
-            done(err)
-          }
-        }, 10)
-      } else if (c === 2) {
-        assert(!c2Flag, 'repeated message 2')
-        c2Flag = true
-        // 5b. state changes to 'low', outputLow is sent
-        msg.should.have.property('payload', false)
-        testNode.should.have.property('state', 'low')
-        // 6. done
-        done()
-      }
-    } catch (err) {
-      done(err)
-    }
+function promiseNodeResponse (testNode, helperNode, payload) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => {
+      helperNode.on('input', _msg => { throw new Error('message after timeout') })
+      reject(new Error('timeout'))
+    }, 5)
+    helperNode.on('input', msg => {
+      clearTimeout(t)
+      resolve(msg)
+    })
+    testNode.receive(payload)
   })
-  // 1a. send value below falling threshold
-  testNode.receive({ payload: 7 })
+}
+
+async function testHysteresisAsync (testNode, helperNode) {
+  // default to low
+  const msg1 = await promiseNodeResponse(testNode, helperNode, { payload: 7 })
+  msg1.should.have.property('payload', false)
+
+  // into deadband
+  await assert.rejects(promiseNodeResponse(testNode, helperNode, { payload: 9 }), { message: 'timeout' })
+
+  // low to high
+  const msg2 = await promiseNodeResponse(testNode, helperNode, { payload: 11 })
+  msg2.should.have.property('payload', true)
+
+  // into deadband
+  await assert.rejects(promiseNodeResponse(testNode, helperNode, { payload: 9 }), { message: 'timeout' })
+
+  // high to low
+  const msg3 = await promiseNodeResponse(testNode, helperNode, { payload: 7 })
+  msg3.should.have.property('payload', false)
 }
