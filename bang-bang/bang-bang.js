@@ -59,7 +59,7 @@ module.exports = function (RED) {
       //   thresholdFalling: thresholdFallingValue
       // })});
 
-      var stateChanged = false
+      let stateChanged = false
       if (this.state !== 'low' && currentValue < thresholdFallingValue) {
         stateChanged = true
         this.state = 'low'
