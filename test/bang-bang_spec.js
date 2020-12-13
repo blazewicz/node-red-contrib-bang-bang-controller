@@ -47,6 +47,8 @@ async function testHysteresisAsync (testNode, helperNode) {
   msg3.should.have.property('payload', false)
 }
 
+helper.init(require.resolve('node-red'))
+
 describe('bang-bang node', function () {
   beforeEach(function (done) {
     helper.startServer(done)
