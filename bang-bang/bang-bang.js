@@ -15,19 +15,32 @@ module.exports = function (RED) {
       this.outputLowType = config.outputLowType || 'bool'
       this.state = config.initialState || 'undefined'
 
-      this.on('input', this.onInput)
+      this.updateStatus()
 
-      this.init()
+      // TODO: send initial message
+
+      this.on('input', this.onInput)
     }
 
-    init () {
+    updateStatus () {
+      let fill
+      switch (this.state) {
+        case 'undefined':
+          fill = 'grey'
+          break
+        case 'high':
+          fill = 'red'
+          break
+        case 'low':
+          fill = 'blue'
+          break
+      }
+
       this.status({
-        fill: (this.state === 'undefined' ? 'grey' : (this.state === 'high' ? 'red' : 'blue')),
+        fill: fill,
         shape: 'dot',
         text: this.state
       })
-
-      // TODO: send initial message
     }
 
     onInput (msg) {
@@ -68,7 +81,7 @@ module.exports = function (RED) {
       }
 
       if (stateChanged) {
-        this.status({ fill: (this.state === 'high' ? 'red' : 'blue'), shape: 'dot', text: this.state })
+        this.updateStatus()
 
         let payload, payloadType
         if (this.state === 'high') {
