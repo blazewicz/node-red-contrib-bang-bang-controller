@@ -21,6 +21,10 @@ module.exports = function (RED) {
 
       // TODO: send initial message
 
+      if (this.state === 'high' || this.state === 'low') {
+        this.send(this.nodeContext.get('lastOutput'))
+      }
+
       this.on('input', this.onInput)
     }
 
@@ -105,6 +109,9 @@ module.exports = function (RED) {
         } else {
           msgOut = { payload: RED.util.evaluateNodeProperty(payload, payloadType, this) }
         }
+
+        this.lastOutput = msgOut
+        this.nodeContext.set('lastOutput', msgOut)
 
         this.send(msgOut)
       }
