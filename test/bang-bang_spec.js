@@ -131,6 +131,26 @@ describe('bang-bang node', function () {
     call.should.be.calledWithExactly('Property is not a number')
   })
 
+  it('should ignore messages without payload', async function () {
+    const flow = [
+      {
+        id: 'n1',
+        type: 'bang-bang',
+        name: 'bangbangNode',
+        thresholdRising: 10,
+        thresholdFalling: 8,
+        wires: [['n2']]
+      },
+      { id: 'n2', type: 'helper' }
+    ]
+    await loadFlow(bangbangNode, flow)
+
+    const n1 = helper.getNode('n1')
+    const n2 = helper.getNode('n2')
+
+    await promiseNodeResponse(n1, n2, { someField: 42 }).should.be.rejectedWith('timeout')
+  })
+
   it('should handle nested message property', async function () {
     const flow = [
       {
