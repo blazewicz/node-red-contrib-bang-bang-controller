@@ -6,7 +6,7 @@ const bangbangNode = require('../bang-bang/bang-bang.js')
 const msgTimeout = 5
 
 function loadFlow (node, flow) {
-  return new Promise(resolve => helper.load(node, flow, () => resolve()))
+  return new Promise(resolve => helper.load(node, flow, resolve))
 }
 
 function sleep (ms) {
