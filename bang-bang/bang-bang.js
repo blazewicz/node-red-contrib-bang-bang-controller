@@ -13,7 +13,9 @@ module.exports = function (RED) {
       this.outputHighType = config.outputHighType || 'bool'
       this.outputLow = config.outputLow || false
       this.outputLowType = config.outputLowType || 'bool'
-      this.state = config.initialState || 'undefined'
+
+      this.nodeContext = this.context()
+      this.state = this.nodeContext.get('state') || config.initialState || 'undefined'
 
       this.updateStatus()
 
@@ -82,6 +84,7 @@ module.exports = function (RED) {
 
       if (stateChanged) {
         this.updateStatus()
+        this.nodeContext.set('state', this.state)
 
         let payload, payloadType
         if (this.state === 'high') {
