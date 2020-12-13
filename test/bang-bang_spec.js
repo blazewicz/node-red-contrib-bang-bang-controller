@@ -170,14 +170,16 @@ describe('bang-bang node', function () {
   })
 
   it('should report invalid JSONata', async function () {
-    const flow = [{
-      id: 'n1',
-      type: 'bang-bang',
-      name: 'bangbangNode',
-      thresholdRisingType: 'jsonata',
-      thresholdRising: '$.payload +',
-      thresholdFalling: 8
-    }]
+    const flow = [
+      {
+        id: 'n1',
+        type: 'bang-bang',
+        name: 'bangbangNode',
+        thresholdRisingType: 'jsonata',
+        thresholdRising: '$.payload +',
+        thresholdFalling: 8
+      }
+    ]
     await loadFlow(bangbangNode, flow)
 
     const n1 = helper.getNode('n1')
@@ -190,7 +192,14 @@ describe('bang-bang node', function () {
   describe('set thresholds', function () {
     it('should be able to set thresholds with numbers', async function () {
       const flow = [
-        { id: 'n1', type: 'bang-bang', name: 'bangbangNode', thresholdRising: 10, thresholdFalling: 8, wires: [['n2']] },
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          wires: [['n2']]
+        },
         { id: 'n2', type: 'helper' }
       ]
       await loadFlow(bangbangNode, flow)
