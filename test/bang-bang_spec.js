@@ -1,4 +1,3 @@
-const assert = require('assert')
 const helper = require('node-red-node-test-helper')
 const Context = require('@node-red/runtime/lib/nodes/context')
 const bangbangNode = require('../bang-bang/bang-bang.js')
@@ -29,21 +28,21 @@ function promiseNodeResponse (testNode, helperNode, payload) {
 
 async function testHysteresisAsync (testNode, helperNode) {
   // default to low
-  const msg1 = await promiseNodeResponse(testNode, helperNode, { payload: 7 })
+  const msg1 = await promiseNodeResponse(testNode, helperNode, { payload: 7 }).should.be.resolved()
   msg1.should.have.property('payload', false)
 
   // into deadband
-  await assert.rejects(promiseNodeResponse(testNode, helperNode, { payload: 9 }), { message: 'timeout' })
+  await promiseNodeResponse(testNode, helperNode, { payload: 9 }).should.be.rejectedWith('timeout')
 
   // low to high
-  const msg2 = await promiseNodeResponse(testNode, helperNode, { payload: 11 })
+  const msg2 = await promiseNodeResponse(testNode, helperNode, { payload: 11 }).should.be.resolved()
   msg2.should.have.property('payload', true)
 
   // into deadband
-  await assert.rejects(promiseNodeResponse(testNode, helperNode, { payload: 9 }), { message: 'timeout' })
+  await promiseNodeResponse(testNode, helperNode, { payload: 9 }).should.be.rejectedWith('timeout')
 
   // high to low
-  const msg3 = await promiseNodeResponse(testNode, helperNode, { payload: 7 })
+  const msg3 = await promiseNodeResponse(testNode, helperNode, { payload: 7 }).should.be.resolved()
   msg3.should.have.property('payload', false)
 }
 
@@ -107,7 +106,7 @@ describe('bang-bang node', function () {
     const n1 = helper.getNode('n1')
     const n2 = helper.getNode('n2')
 
-    const msg = await promiseNodeResponse(n1, n2, { payload: '11' })
+    const msg = await promiseNodeResponse(n1, n2, { payload: '11' }).should.be.resolved()
     msg.should.have.property('payload', '11')
   })
 
@@ -148,7 +147,7 @@ describe('bang-bang node', function () {
     const n1 = helper.getNode('n1')
     const n2 = helper.getNode('n2')
 
-    const msg = await promiseNodeResponse(n1, n2, { payload: { value: 11 } })
+    const msg = await promiseNodeResponse(n1, n2, { payload: { value: 11 } }).should.be.resolved()
     msg.should.have.property('payload', 11)
   })
 
@@ -336,7 +335,7 @@ describe('bang-bang node', function () {
       const n1 = helper.getNode('n1')
       const n2 = helper.getNode('n2')
 
-      const msg = await promiseNodeResponse(n1, n2, { payload: 11, prop1: 'val1' })
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11, prop1: 'val1' }).should.be.resolved()
       msg.should.have.property('payload', 'val1')
     })
 
@@ -362,7 +361,7 @@ describe('bang-bang node', function () {
 
       n1.context().flow.set('var1', 'val1')
 
-      const msg = await promiseNodeResponse(n1, n2, { payload: 11 })
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
       msg.should.have.property('payload', 'val1')
     })
 
@@ -387,7 +386,7 @@ describe('bang-bang node', function () {
 
       n1.context().global.set('var1', 'val1')
 
-      const msg = await promiseNodeResponse(n1, n2, { payload: 11 })
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
       msg.should.have.property('payload', 'val1')
     })
 
@@ -409,7 +408,7 @@ describe('bang-bang node', function () {
       const n1 = helper.getNode('n1')
       const n2 = helper.getNode('n2')
 
-      const msg = await promiseNodeResponse(n1, n2, { payload: 11, prop1: 'val1' })
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11, prop1: 'val1' }).should.be.resolved()
       msg.should.have.property('payload', 11)
       msg.should.have.property('prop1', 'val1')
     })
