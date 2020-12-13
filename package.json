@@ -24,12 +24,13 @@
     },
     "scripts": {
         "lint": "standard bang-bang/**/*.js test/**/*.js",
-        "test": "mocha \"test/**/*_spec.js\""
+        "test": "nyc mocha \"test/**/*_spec.js\""
     },
     "devDependencies": {
         "mocha": "^8.2.1",
         "node-red": "^1.2.6",
         "node-red-node-test-helper": "^0.2.5",
+        "nyc": "^15.1.0",
         "standard": "^16.0.3"
     },
     "standard": {
