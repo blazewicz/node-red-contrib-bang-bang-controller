@@ -8,22 +8,23 @@ function loadFlow (node, flow) {
   return new Promise(resolve => helper.load(node, flow, resolve))
 }
 
-function sleep (ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-function promiseNodeResponse (testNode, helperNode, payload) {
+function promiseNodeCallback (node, callbackName) {
   return new Promise((resolve, reject) => {
     const t = setTimeout(() => {
-      helperNode.on('input', _msg => { throw new Error('message after timeout') })
+      node.on(callbackName, _ => { throw new Error('callback after timeout') })
       reject(new Error('timeout'))
     }, msgTimeout)
-    helperNode.on('input', msg => {
+
+    node.on(callbackName, message => {
       clearTimeout(t)
-      resolve(msg)
+      resolve(message)
     })
-    testNode.receive(payload)
   })
+}
+
+async function promiseNodeResponse (testNode, helperNode, payload) {
+  testNode.receive(payload)
+  return await promiseNodeCallback(helperNode, 'input')
 }
 
 async function testHysteresisAsync (testNode, helperNode) {
@@ -123,8 +124,8 @@ describe('bang-bang node', function () {
     const n1 = helper.getNode('n1')
 
     n1.receive({ payload: 'foo' })
-    await sleep(msgTimeout)
-    n1.error.should.be.calledWithExactly('Property is not a number')
+    const call = await promiseNodeCallback(n1, 'call:error').should.be.resolved()
+    call.should.be.calledWithExactly('Property is not a number')
   })
 
   it('should handle nested message property', async function () {
@@ -167,8 +168,8 @@ describe('bang-bang node', function () {
     const n1 = helper.getNode('n1')
 
     n1.receive({ payload: 11 })
-    await sleep(msgTimeout)
-    n1.error.should.been.calledWithMatch(/Invalid expression used as threshold: .+/)
+    const call = await promiseNodeCallback(n1, 'call:error').should.be.resolved()
+    call.should.been.calledWithMatch(/Invalid expression used as threshold: .+/)
   })
 
   describe('set thresholds', function () {
