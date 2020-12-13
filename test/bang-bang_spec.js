@@ -2,7 +2,7 @@ const helper = require('node-red-node-test-helper')
 const Context = require('@node-red/runtime/lib/nodes/context')
 const bangbangNode = require('../bang-bang/bang-bang.js')
 
-const msgTimeout = 5
+const msgTimeout = 6
 
 function loadFlow (node, flow) {
   return new Promise(resolve => helper.load(node, flow, resolve))
