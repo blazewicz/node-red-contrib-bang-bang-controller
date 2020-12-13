@@ -425,4 +425,61 @@ describe('bang-bang node', function () {
       await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout')
     })
   })
+
+  describe('set status', function () {
+    it('should set proper status by default', async function () {
+      const flow = [
+        { id: 'n1', type: 'bang-bang', name: 'bangbangNode' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+
+      n1.status.should.be.calledWithExactly({ fill: 'grey', shape: 'dot', text: 'undefined' })
+    })
+
+    it('should set proper status on low output', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      await promiseNodeResponse(n1, n2, { payload: 7 }).should.be.resolved()
+
+      n1.status.should.be.calledWithExactly({ fill: 'blue', shape: 'dot', text: 'low' })
+    })
+
+    it('should set proper status on high output', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
+
+      n1.status.should.be.calledWithExactly({ fill: 'red', shape: 'dot', text: 'high' })
+    })
+  })
 })
