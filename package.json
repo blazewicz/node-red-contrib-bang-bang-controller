@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-bang-bang-controller",
-    "version": "0.1.2",
+    "version": "0.2.1",
     "author": "Krzysztof Blazewicz <blazewicz.krzysztof@gmail.com>",
     "license": "MIT",
     "description": "A bang-bang controller node with dynamic setpoints and outputs",
