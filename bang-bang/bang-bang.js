@@ -33,8 +33,7 @@ module.exports = function (RED) {
     onInput (msg) {
       const propertyValue = RED.util.getMessageProperty(msg, this.property)
       if (propertyValue === undefined) {
-        // skip message with no payload property
-        this.error(`Message has no property "${this.property}"`)
+        // ignore message with no payload property
         return
       }
       const currentValue = Number(propertyValue)

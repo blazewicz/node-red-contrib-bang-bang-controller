@@ -151,24 +151,6 @@ describe('bang-bang node', function () {
     msg.should.have.property('payload', 11)
   })
 
-  it('should report missing property', async function () {
-    const flow = [{
-      id: 'n1',
-      type: 'bang-bang',
-      name: 'bangbangNode',
-      property: 'value',
-      thresholdRising: 10,
-      thresholdFalling: 8
-    }]
-    await loadFlow(bangbangNode, flow)
-
-    const n1 = helper.getNode('n1')
-
-    n1.receive({ payload: 11 })
-    await sleep(msgTimeout)
-    n1.error.should.be.calledWithExactly('Message has no property "value"')
-  })
-
   it('should report invalid JSONata', async function () {
     const flow = [
       {
