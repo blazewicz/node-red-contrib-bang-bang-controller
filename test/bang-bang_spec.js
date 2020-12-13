@@ -1,5 +1,4 @@
 const helper = require('node-red-node-test-helper')
-const Context = require('@node-red/runtime/lib/nodes/context')
 const bangbangNode = require('../bang-bang/bang-bang.js')
 
 const msgTimeout = 6
@@ -60,8 +59,6 @@ describe('bang-bang node', function () {
 
   afterEach(function (done) {
     helper.unload()
-      .then(() => Context.clean({ allNodes: {} }))
-      .then(() => Context.close())
       .then(() => done())
   })
 
