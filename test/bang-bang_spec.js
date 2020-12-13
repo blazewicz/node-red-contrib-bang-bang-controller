@@ -80,6 +80,7 @@ describe('bang-bang node', function () {
     n1.should.have.property('outputLow', false)
     n1.should.have.property('outputLowType', 'bool')
     n1.should.have.property('state', 'undefined')
+    n1.should.have.property('valid', true)
   })
 
   it('should be able to set initial state', async function () {
@@ -91,7 +92,7 @@ describe('bang-bang node', function () {
     n1.should.have.property('state', 'low')
   })
 
-  it('should handle number as a string', async function () {
+  it('should understand string input', async function () {
     const flow = [
       {
         id: 'n1',
@@ -99,8 +100,6 @@ describe('bang-bang node', function () {
         name: 'bangbangNode',
         thresholdRising: 10,
         thresholdFalling: 8,
-        outputHighType: 'msg',
-        outputHigh: 'payload',
         wires: [['n2']]
       },
       { id: 'n2', type: 'helper' }
@@ -111,7 +110,7 @@ describe('bang-bang node', function () {
     const n2 = helper.getNode('n2')
 
     const msg = await promiseNodeResponse(n1, n2, { payload: '11' }).should.be.resolved()
-    msg.should.have.property('payload', '11')
+    msg.should.have.property('payload', true)
   })
 
   it('should report unparseable input', async function () {
@@ -149,50 +148,6 @@ describe('bang-bang node', function () {
     const n2 = helper.getNode('n2')
 
     await promiseNodeResponse(n1, n2, { someField: 42 }).should.be.rejectedWith('timeout')
-  })
-
-  it('should handle nested message property', async function () {
-    const flow = [
-      {
-        id: 'n1',
-        type: 'bang-bang',
-        name: 'bangbangNode',
-        property: 'payload.value',
-        thresholdRising: 10,
-        thresholdFalling: 8,
-        outputHighType: 'msg',
-        outputHigh: 'payload.value',
-        wires: [['n2']]
-      },
-      { id: 'n2', type: 'helper' }
-    ]
-    await loadFlow(bangbangNode, flow)
-
-    const n1 = helper.getNode('n1')
-    const n2 = helper.getNode('n2')
-
-    const msg = await promiseNodeResponse(n1, n2, { payload: { value: 11 } }).should.be.resolved()
-    msg.should.have.property('payload', 11)
-  })
-
-  it('should report invalid JSONata', async function () {
-    const flow = [
-      {
-        id: 'n1',
-        type: 'bang-bang',
-        name: 'bangbangNode',
-        thresholdRisingType: 'jsonata',
-        thresholdRising: '$.payload +',
-        thresholdFalling: 8
-      }
-    ]
-    await loadFlow(bangbangNode, flow)
-
-    const n1 = helper.getNode('n1')
-
-    n1.receive({ payload: 11 })
-    const call = await promiseNodeCallback(n1, 'call:error').should.be.resolved()
-    call.should.been.calledWithMatch(/Invalid expression used as threshold: .+/)
   })
 
   describe('set thresholds', function () {
@@ -330,6 +285,26 @@ describe('bang-bang node', function () {
         await testHysteresisAsync(n1, n2)
       })
     })
+
+    it('should report invalid JSONata in threshold', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRisingType: 'jsonata',
+          thresholdRising: '$.payload +',
+          thresholdFalling: 8
+        }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+
+      n1.receive({ payload: 11 })
+      const call = await promiseNodeCallback(n1, 'call:error').should.be.resolved()
+      call.should.been.calledWithMatch(/Invalid expression used as threshold: .+/)
+    })
   })
 
   describe('set outputs', function () {
@@ -354,6 +329,30 @@ describe('bang-bang node', function () {
 
       const msg = await promiseNodeResponse(n1, n2, { payload: 11, prop1: 'val1' }).should.be.resolved()
       msg.should.have.property('payload', 'val1')
+    })
+
+    it('should be able to set output to nested msg property', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          property: 'payload.value',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: 'msg',
+          outputHigh: 'payload.value',
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      const msg = await promiseNodeResponse(n1, n2, { payload: { value: 11 } }).should.be.resolved()
+      msg.should.have.property('payload', 11)
     })
 
     it('should be able to set output to flow variable', async function () {
@@ -407,6 +406,145 @@ describe('bang-bang node', function () {
       msg.should.have.property('payload', 'val1')
     })
 
+    it('should be able to set output to string', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: 'str',
+          outputHigh: 'val1',
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
+      msg.should.have.property('payload', 'val1')
+    })
+
+    it('should be able to set output to number', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: 'num',
+          outputHigh: '42',
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
+      msg.should.have.property('payload', 42)
+    })
+
+    it('should be able to set output to boolean', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: 'bool',
+          outputHigh: true,
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
+      msg.should.have.property('payload', true)
+    })
+
+    it('should be able to set output to JSON', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: 'json',
+          outputHigh: '{"key": "value"}',
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
+      msg.should.have.property('payload')
+      msg.payload.should.have.property('key', 'value')
+    })
+
+    it('should be able to set output to Buffer', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: 'bin',
+          outputHigh: '[104, 101, 108, 108, 111]',
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
+      msg.should.have.property('payload', Buffer.from([104, 101, 108, 108, 111]))
+    })
+
+    it('should be able to set output to JSONata', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: 'jsonata',
+          outputHigh: '$.payload + 31',
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      const msg = await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
+      msg.should.have.property('payload', 42)
+    })
+
     it('should be able to set output to original message', async function () {
       const flow = [
         {
@@ -450,6 +588,101 @@ describe('bang-bang node', function () {
 
       await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout')
     })
+
+    it('should disable output if JSON expression is invalid', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputLowType: 'json',
+          outputLow: '{"key": "value"'
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      n1.error.should.be.calledWithMatch(/Invalid output expression for falling edge.+/)
+
+      n1.should.have.property('valid', false)
+      await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout')
+    })
+
+    it('should disable output if Buffer expression is invalid', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputLowType: 'bin',
+          outputLow: '[95, 96, 97, 98'
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      n1.error.should.be.calledWithMatch(/Invalid output expression for falling edge.+/)
+
+      n1.should.have.property('valid', false)
+      await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout')
+    })
+
+    it('should disable output if JSONata expression is invalid', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: 'jsonata',
+          outputHigh: '$.payload +'
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      n1.error.should.be.calledWithMatch(/Invalid output expression for rising edge.+/)
+
+      n1.should.have.property('valid', false)
+      await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout')
+    })
+
+    it('should warn if output could not be calculated', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          outputHighType: 'jsonata',
+          outputHigh: '$.payloat + 31'
+        }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+
+      n1.receive({ payload: 11 })
+      const call = await promiseNodeCallback(n1, 'call:warn').should.be.resolved()
+      call.should.been.calledWithExactly('Output could not be calculated')
+    })
+
+    // TODO env
   })
 
   describe('set status', function () {

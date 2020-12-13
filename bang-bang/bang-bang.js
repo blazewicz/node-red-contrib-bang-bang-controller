@@ -1,4 +1,9 @@
+const util = require('util')
+
 module.exports = function (RED) {
+  const evaluateNodeProperty = util.promisify(RED.util.evaluateNodeProperty)
+  const evaluateJSONataExpression = util.promisify(RED.util.evaluateJSONataExpression)
+
   class BangBangNode {
     constructor (config) {
       RED.nodes.createNode(this, config)
@@ -19,7 +24,59 @@ module.exports = function (RED) {
 
       // TODO: send initial message
 
+      this.valid = true
+
+      try {
+        this.outputHigh = this.prepareOutput(this.outputHigh, this.outputHighType)
+      } catch (e) {
+        this.error(`Invalid output expression for rising edge "${e.message}"`)
+        this.valid = false
+      }
+
+      try {
+        this.outputLow = this.prepareOutput(this.outputLow, this.outputLowType)
+      } catch (e) {
+        this.error(`Invalid output expression for falling edge "${e.message}"`)
+        this.valid = false
+      }
+
       this.on('input', this.onInput)
+    }
+
+    prepareOutput (value, type) {
+      switch (type) {
+        case 'num':
+          return Number(value)
+        case 'json':
+          return JSON.parse(value)
+        case 'bin':
+          return Buffer.from(JSON.parse(value))
+        case 'jsonata':
+          return RED.util.prepareJSONataExpression(value, this)
+        case 'bool':
+        case 'env':
+          return RED.util.evaluateNodeProperty(value, type, this)
+        default:
+          return value
+      }
+    }
+
+    async getOutputMessage (value, type, msg) {
+      switch (type) {
+        case 'msg':
+          return { payload: RED.util.getMessageProperty(msg, value) }
+        case 'flow':
+        case 'global':
+          return { payload: await evaluateNodeProperty(value, type, this, msg) }
+        case 'jsonata':
+          return { payload: await evaluateJSONataExpression(value, msg) }
+        case 'pay':
+          return msg
+        case 'nul':
+          return null
+        default:
+          return { payload: value }
+      }
     }
 
     updateStatus () {
@@ -43,7 +100,11 @@ module.exports = function (RED) {
       })
     }
 
-    onInput (msg) {
+    async onInput (msg) {
+      if (!this.valid) {
+        return
+      }
+
       const propertyValue = RED.util.getMessageProperty(msg, this.property)
       if (propertyValue === undefined) {
         // ignore message with no payload property
@@ -92,18 +153,15 @@ module.exports = function (RED) {
           payloadType = this.outputLowType
         }
 
-        let msgOut
-        if (payloadType === 'nul') {
-          msgOut = null
-        } else if (payloadType === 'pay') {
-          msgOut = msg
-        } else if (payloadType === 'msg' || payloadType === 'jsonata') {
-          msgOut = { payload: RED.util.evaluateNodeProperty(payload, payloadType, this, msg) }
-        } else {
-          msgOut = { payload: RED.util.evaluateNodeProperty(payload, payloadType, this) }
-        }
+        const msgOut = await this.getOutputMessage(payload, payloadType, msg)
 
-        this.send(msgOut)
+        if (msgOut === null) {
+          // do nothing
+        } else if (msgOut.payload === undefined) {
+          this.warn('Output could not be calculated')
+        } else {
+          this.send(msgOut)
+        }
       }
     }
   }
