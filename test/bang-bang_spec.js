@@ -50,15 +50,19 @@ async function testHysteresisAsync (testNode, helperNode) {
 helper.init(require.resolve('node-red'))
 
 describe('bang-bang node', function () {
-  beforeEach(function (done) {
+  before(function (done) {
     helper.startServer(done)
+  })
+
+  after(function (done) {
+    helper.stopServer(done)
   })
 
   afterEach(function (done) {
     helper.unload()
       .then(() => Context.clean({ allNodes: {} }))
       .then(() => Context.close())
-      .then(() => helper.stopServer(done))
+      .then(() => done())
   })
 
   it('should be loaded with correct defaults', async function () {
