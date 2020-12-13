@@ -13,11 +13,17 @@ module.exports = function (RED) {
       this.outputHighType = config.outputHighType || 'bool'
       this.outputLow = config.outputLow || false
       this.outputLowType = config.outputLowType || 'bool'
-      this.state = config.initialState || 'undefined'
+
+      this.nodeContext = this.context()
+      this.state = this.nodeContext.get('state') || config.initialState || 'undefined'
 
       this.updateStatus()
 
       // TODO: send initial message
+
+      if (this.state === 'high' || this.state === 'low') {
+        this.send(this.nodeContext.get('lastOutput'))
+      }
 
       this.on('input', this.onInput)
     }
@@ -82,6 +88,7 @@ module.exports = function (RED) {
 
       if (stateChanged) {
         this.updateStatus()
+        this.nodeContext.set('state', this.state)
 
         let payload, payloadType
         if (this.state === 'high') {
@@ -102,6 +109,9 @@ module.exports = function (RED) {
         } else {
           msgOut = { payload: RED.util.evaluateNodeProperty(payload, payloadType, this) }
         }
+
+        this.lastOutput = msgOut
+        this.nodeContext.set('lastOutput', msgOut)
 
         this.send(msgOut)
       }

@@ -1,4 +1,5 @@
 const helper = require('node-red-node-test-helper')
+const should = require('should')
 const Context = require('@node-red/runtime/lib/nodes/context')
 const bangbangNode = require('../bang-bang/bang-bang.js')
 
@@ -60,9 +61,100 @@ describe('bang-bang node', function () {
 
   afterEach(function (done) {
     helper.unload()
-      .then(() => Context.clean({ allNodes: {} }))
-      .then(() => Context.close())
-      .then(() => done())
+      // .then(() => Context.clean({ allNodes: {} }))
+      // .then(() => Context.close())
+      .then(done)
+  })
+
+  describe('state persistence', function () {
+    // before(function (done) {
+    //   // Context.init({ contextStorage: { default: "memory" } })
+    //   Context.init({})
+    //   Context.load()
+    //     // .then(Context.clean({ allNodes: {} }))
+    //     .then(() => done())
+    // })
+
+    after(function (done) {
+      Context.clean({ allNodes: {} })
+        .then(Context.close())
+        .then(() => done())
+    })
+
+    afterEach(function (done) {
+      helper.unload()
+        .then(done)
+    })
+
+    async function initContext () {
+      Context.init({
+        // contextStorage: {
+        //   default: "memory"
+        // }
+      })
+      return Context.load()
+    }
+
+    it('should initialize with default state', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8
+        }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+
+      n1.state.should.eql('undefined')
+      should.not.exist(n1.context().get('state'))
+    })
+
+    it('should store changed state to context', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdRising: 10,
+          thresholdFalling: 8,
+          wires: [['n2']]
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+      await initContext()
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      await promiseNodeResponse(n1, n2, { payload: '11' }).should.be.resolved()
+
+      n1.state.should.eql('high')
+      n1.context().get('state').should.eql('high')
+    })
+
+    // it('should restore previous state from context', async function () {
+    //   const flow = [
+    //     {
+    //       id: 'n1',
+    //       type: 'bang-bang',
+    //       name: 'bangbangNode',
+    //       thresholdRising: 10,
+    //       thresholdFalling: 8
+    //     }
+    //   ]
+    //   await loadFlow(bangbangNode, flow)
+    //   await initContext()
+
+    //   const n1 = helper.getNode('n1')
+
+    //   n1.state.should.eql('high')
+    //   n1.context().get('state').should.eql('high')
+    // })
   })
 
   it('should be loaded with correct defaults', async function () {
