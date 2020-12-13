@@ -282,10 +282,12 @@ describe('bang-bang node', function () {
         process.env.TH_HIGH = '10'
         process.env.TH_LOW = '8'
       })
+
       after(function () {
         delete process.env.TH_HIGH
         delete process.env.TH_LOW
       })
+
       it('should be able to set thresholds from env', async function () {
         const flow = [
           {
