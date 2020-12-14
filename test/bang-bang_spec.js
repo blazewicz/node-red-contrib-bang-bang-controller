@@ -337,13 +337,13 @@ describe('bang-bang node', function () {
     })
 
     it('should set proper status on low output', async function () {
-      await prepareFlow({ thresholdUpper: 10, thresholdLower: 8 })
+      await prepareFlow({})
       await promiseNodeResponse(n1, n2, { payload: 7 }).should.be.resolved()
       n1.status.should.be.calledWithExactly({ fill: 'blue', shape: 'dot', text: 'low' })
     })
 
     it('should set proper status on high output', async function () {
-      await prepareFlow({ thresholdUpper: 10, thresholdLower: 8 })
+      await prepareFlow({})
       await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.resolved()
       n1.status.should.be.calledWithExactly({ fill: 'red', shape: 'dot', text: 'high' })
     })
