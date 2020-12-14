@@ -57,6 +57,8 @@ describe('bang-bang node', function () {
         id: 'n1',
         type: 'bang-bang',
         name: 'bangbangNode',
+        propertyType: config.propertyType || 'msg',
+        property: config.property || 'payload',
         thresholdUpperType: config.thresholdUpperType || 10,
         thresholdUpper: config.thresholdUpper || 10,
         thresholdLowerType: config.thresholdLowerType || 8,
@@ -123,6 +125,12 @@ describe('bang-bang node', function () {
     it('should understand string input', async function () {
       await prepareFlow({})
       const msg = await promiseNodeResponse(n1, n2, { payload: '11' }).should.be.resolved()
+      msg.should.have.property('payload', true)
+    })
+
+    it('should read value from custom property', async function () {
+      await prepareFlow({ property: 'prop1' })
+      const msg = await promiseNodeResponse(n1, n2, { prop1: 11 }).should.be.resolved()
       msg.should.have.property('payload', true)
     })
 
