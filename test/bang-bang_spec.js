@@ -71,10 +71,10 @@ describe('bang-bang node', function () {
     n1.should.have.property('name', 'bangbangNode')
     n1.should.have.property('propertyType', 'msg')
     n1.should.have.property('property', 'payload')
-    n1.should.have.property('thresholdRising', undefined)
-    n1.should.have.property('thresholdRisingType', 'num')
-    n1.should.have.property('thresholdFalling', undefined)
-    n1.should.have.property('thresholdFallingType', 'num')
+    n1.should.have.property('thresholdUpper', undefined)
+    n1.should.have.property('thresholdUpperType', 'num')
+    n1.should.have.property('thresholdLower', undefined)
+    n1.should.have.property('thresholdLowerType', 'num')
     n1.should.have.property('outputHigh', true)
     n1.should.have.property('outputHighType', 'bool')
     n1.should.have.property('outputLow', false)
@@ -98,8 +98,8 @@ describe('bang-bang node', function () {
         id: 'n1',
         type: 'bang-bang',
         name: 'bangbangNode',
-        thresholdRising: 10,
-        thresholdFalling: 8,
+        thresholdUpper: 10,
+        thresholdLower: 8,
         wires: [['n2']]
       },
       { id: 'n2', type: 'helper' }
@@ -118,8 +118,8 @@ describe('bang-bang node', function () {
       id: 'n1',
       type: 'bang-bang',
       name: 'bangbangNode',
-      thresholdRising: 10,
-      thresholdFalling: 8
+      thresholdUpper: 10,
+      thresholdLower: 8
     }]
     await loadFlow(bangbangNode, flow)
 
@@ -136,8 +136,8 @@ describe('bang-bang node', function () {
         id: 'n1',
         type: 'bang-bang',
         name: 'bangbangNode',
-        thresholdRising: 10,
-        thresholdFalling: 8,
+        thresholdUpper: 10,
+        thresholdLower: 8,
         wires: [['n2']]
       },
       { id: 'n2', type: 'helper' }
@@ -157,8 +157,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           wires: [['n2']]
         },
         { id: 'n2', type: 'helper' }
@@ -168,10 +168,10 @@ describe('bang-bang node', function () {
       const n1 = helper.getNode('n1')
       const n2 = helper.getNode('n2')
 
-      n1.should.have.property('thresholdRising', 10)
-      n1.should.have.property('thresholdRisingType', 'num')
-      n1.should.have.property('thresholdFalling', 8)
-      n1.should.have.property('thresholdFallingType', 'num')
+      n1.should.have.property('thresholdUpper', 10)
+      n1.should.have.property('thresholdUpperType', 'num')
+      n1.should.have.property('thresholdLower', 8)
+      n1.should.have.property('thresholdLowerType', 'num')
 
       await testHysteresisAsync(n1, n2)
     })
@@ -182,10 +182,10 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRisingType: 'flow',
-          thresholdRising: 'th_high',
-          thresholdFallingType: 'flow',
-          thresholdFalling: 'th_low',
+          thresholdUpperType: 'flow',
+          thresholdUpper: 'th_high',
+          thresholdLowerType: 'flow',
+          thresholdLower: 'th_low',
           wires: [['n2']],
           z: 'flow'
         },
@@ -208,10 +208,10 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRisingType: 'global',
-          thresholdRising: 'th_high',
-          thresholdFallingType: 'global',
-          thresholdFalling: 'th_low',
+          thresholdUpperType: 'global',
+          thresholdUpper: 'th_high',
+          thresholdLowerType: 'global',
+          thresholdLower: 'th_low',
           wires: [['n2']]
         },
         { id: 'n2', type: 'helper' }
@@ -233,10 +233,10 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRisingType: 'jsonata',
-          thresholdRising: '$flowContext("th_low") + 2',
-          thresholdFallingType: 'flow',
-          thresholdFalling: 'th_low',
+          thresholdUpperType: 'jsonata',
+          thresholdUpper: '$flowContext("th_low") + 2',
+          thresholdLowerType: 'flow',
+          thresholdLower: 'th_low',
           wires: [['n2']],
           z: 'flow'
         },
@@ -269,10 +269,10 @@ describe('bang-bang node', function () {
             id: 'n1',
             type: 'bang-bang',
             name: 'bangbangNode',
-            thresholdRisingType: 'env',
-            thresholdRising: 'TH_HIGH',
-            thresholdFallingType: 'env',
-            thresholdFalling: 'TH_LOW',
+            thresholdUpperType: 'env',
+            thresholdUpper: 'TH_HIGH',
+            thresholdLowerType: 'env',
+            thresholdLower: 'TH_LOW',
             wires: [['n2']]
           },
           { id: 'n2', type: 'helper' }
@@ -292,9 +292,9 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRisingType: 'jsonata',
-          thresholdRising: '$.payload +',
-          thresholdFalling: 8
+          thresholdUpperType: 'jsonata',
+          thresholdUpper: '$.payload +',
+          thresholdLower: 8
         }
       ]
       await loadFlow(bangbangNode, flow)
@@ -314,8 +314,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'msg',
           outputHigh: 'prop1',
           wires: [['n2']]
@@ -338,8 +338,8 @@ describe('bang-bang node', function () {
           type: 'bang-bang',
           name: 'bangbangNode',
           property: 'payload.value',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'msg',
           outputHigh: 'payload.value',
           wires: [['n2']]
@@ -361,8 +361,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'flow',
           outputHigh: 'var1',
           wires: [['n2']],
@@ -387,8 +387,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'global',
           outputHigh: 'var1',
           wires: [['n2']]
@@ -412,8 +412,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'str',
           outputHigh: 'val1',
           wires: [['n2']]
@@ -435,8 +435,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'num',
           outputHigh: '42',
           wires: [['n2']]
@@ -458,8 +458,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'bool',
           outputHigh: true,
           wires: [['n2']]
@@ -481,8 +481,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'json',
           outputHigh: '{"key": "value"}',
           wires: [['n2']]
@@ -505,8 +505,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'bin',
           outputHigh: '[104, 101, 108, 108, 111]',
           wires: [['n2']]
@@ -528,8 +528,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'jsonata',
           outputHigh: '$.payload + 31',
           wires: [['n2']]
@@ -551,8 +551,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'pay',
           wires: [['n2']]
         },
@@ -574,8 +574,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'nul',
           wires: [['n2']]
         },
@@ -595,8 +595,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputLowType: 'json',
           outputLow: '{"key": "value"'
         },
@@ -619,8 +619,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputLowType: 'bin',
           outputLow: '[95, 96, 97, 98'
         },
@@ -643,8 +643,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'jsonata',
           outputHigh: '$.payload +'
         },
@@ -667,8 +667,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           outputHighType: 'jsonata',
           outputHigh: '$.payloat + 31'
         }
@@ -703,8 +703,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           wires: [['n2']]
         },
         { id: 'n2', type: 'helper' }
@@ -725,8 +725,8 @@ describe('bang-bang node', function () {
           id: 'n1',
           type: 'bang-bang',
           name: 'bangbangNode',
-          thresholdRising: 10,
-          thresholdFalling: 8,
+          thresholdUpper: 10,
+          thresholdLower: 8,
           wires: [['n2']]
         },
         { id: 'n2', type: 'helper' }

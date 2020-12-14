@@ -8,15 +8,15 @@
     <input type="text" id="node-input-property">
     <input type="hidden", id="node-input-propertyType">
   </div>
-  <div class="form-row" id="node-thresholdRising">
-    <label for="node-input-thresholdRising"><i class="fa fa-level-up"></i> Threshold Rising</label>
-    <input type="text" id="node-input-thresholdRising">
-    <input type="hidden", id="node-input-thresholdRisingType">
+  <div class="form-row" id="node-thresholdUpper">
+    <label for="node-input-thresholdUpper"><i class="fa fa-level-up"></i> Threshold Upper</label>
+    <input type="text" id="node-input-thresholdUpper">
+    <input type="hidden", id="node-input-thresholdUpperType">
   </div>
-  <div class="form-row" id="node-thresholdFalling">
-    <label for="node-input-thresholdFalling"><i class="fa fa-level-down"></i>  Threshold Falling</label>
-    <input type="text" id="node-input-thresholdFalling">
-    <input type="hidden", id="node-input-thresholdFallingType">
+  <div class="form-row" id="node-thresholdLower">
+    <label for="node-input-thresholdLower"><i class="fa fa-level-down"></i> Threshold Lower</label>
+    <input type="text" id="node-input-thresholdLower">
+    <input type="hidden", id="node-input-thresholdLowerType">
   </div>
   <div class="form-row">
     <label for="node-input-outputHigh"><i class="fa fa-level-up"></i> Output High</label>
@@ -62,9 +62,7 @@
       <ul>
         <li><a href="https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control">Bang-bang control on Wikipedia</a></li>
       </ul>
-
 </script>
-
 
 <script type="text/javascript">
   RED.nodes.registerType('bang-bang', {
@@ -74,10 +72,10 @@
       name: {value: ""},
       property: {value: "payload"},
       propertyType: {value: "msg"},
-      thresholdRising: { value: "", required: true },
-      thresholdRisingType: {value: "num"},
-      thresholdFalling: { value: "", required: true },
-      thresholdFallingType: {value: "num"},
+      thresholdUpper: { value: "", required: true },
+      thresholdUpperType: {value: "num"},
+      thresholdLower: { value: "", required: true },
+      thresholdLowerType: {value: "num"},
       outputLow: {value: false},
       outputLowType: {value: "bool"},
       outputHigh: {value: true},
@@ -101,15 +99,15 @@
       });
 
       const thresholdTypes = ['flow', 'global', 'num', 'env', 'jsonata'];
-      $("#node-input-thresholdRising").typedInput({
+      $("#node-input-thresholdUpper").typedInput({
         default: 'num',
         types: thresholdTypes,
-        typeField: $("#node-input-thresholdRisingType")
+        typeField: $("#node-input-thresholdUpperType")
       });
-      $("#node-input-thresholdFalling").typedInput({
+      $("#node-input-thresholdLower").typedInput({
         default: 'num',
         types: thresholdTypes,
-        typeField: $("#node-input-thresholdFallingType")
+        typeField: $("#node-input-thresholdLowerType")
       });
 
       const optionPayload = { value: "pay", label: "original message", hasValue: false };

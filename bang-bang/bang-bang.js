@@ -10,10 +10,10 @@ module.exports = function (RED) {
 
       this.property = config.property || 'payload'
       this.propertyType = config.propertyType || 'msg'
-      this.thresholdRising = config.thresholdRising
-      this.thresholdRisingType = config.thresholdRisingType || 'num'
-      this.thresholdFalling = config.thresholdFalling
-      this.thresholdFallingType = config.thresholdFallingType || 'num'
+      this.thresholdUpper = config.thresholdUpper
+      this.thresholdUpperType = config.thresholdUpperType || 'num'
+      this.thresholdLower = config.thresholdLower
+      this.thresholdLowerType = config.thresholdLowerType || 'num'
       this.outputHigh = config.outputHigh || true
       this.outputHighType = config.outputHighType || 'bool'
       this.outputLow = config.outputLow || false
@@ -116,10 +116,10 @@ module.exports = function (RED) {
         return
       }
 
-      let thresholdRisingValue, thresholdFallingValue
+      let thresholdUpperValue, thresholdLowerValue
       try {
-        thresholdRisingValue = RED.util.evaluateNodeProperty(this.thresholdRising, this.thresholdRisingType, this)
-        thresholdFallingValue = RED.util.evaluateNodeProperty(this.thresholdFalling, this.thresholdFallingType, this)
+        thresholdUpperValue = RED.util.evaluateNodeProperty(this.thresholdUpper, this.thresholdUpperType, this)
+        thresholdLowerValue = RED.util.evaluateNodeProperty(this.thresholdLower, this.thresholdLowerType, this)
       } catch (err) {
         this.error(`Invalid expression used as threshold: "${err.message}"`)
       }
@@ -128,15 +128,15 @@ module.exports = function (RED) {
       // RED.comms.publish("debug", {format: "Object", msg: JSON.stringify({
       //   state: this.state,
       //   inputValue: currentValue,
-      //   thresholdRising: thresholdRisingValue,
-      //   thresholdFalling: thresholdFallingValue
+      //   thresholdUpper: thresholdUpperValue,
+      //   thresholdLower: thresholdLowerValue
       // })});
 
       let stateChanged = false
-      if (this.state !== 'low' && currentValue < thresholdFallingValue) {
+      if (this.state !== 'low' && currentValue < thresholdLowerValue) {
         stateChanged = true
         this.state = 'low'
-      } else if (this.state !== 'high' && currentValue > thresholdRisingValue) {
+      } else if (this.state !== 'high' && currentValue > thresholdUpperValue) {
         stateChanged = true
         this.state = 'high'
       }

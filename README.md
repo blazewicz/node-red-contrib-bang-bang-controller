@@ -4,8 +4,8 @@ Bang-bang controller (2 step controller, on-off controller, hysteresis controlle
 
 Node sends one of two programmed output values on state change.
 
-State changes from `low` to `high` when received `payload` value is greater than Rising Threshold.
-Similarly, transition from `high` to `low` occurs when `payload` value is less than Falling Threshold.
+State changes from `low` to `high` when received `payload` value is greater than Threshold Upper.
+Similarly, transition from `high` to `low` occurs when `payload` value is less than Threshold Lower.
 
 Primary intended use of this block is a [thermostat](https://en.wikipedia.org/wiki/Thermostat).
 
