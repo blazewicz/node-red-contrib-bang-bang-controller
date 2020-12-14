@@ -329,11 +329,19 @@ describe('bang-bang node', function () {
   })
 
   describe('set status', function () {
-    it('should set proper status by default', async function () {
-      const flow = [{ id: 'n1', type: 'bang-bang', name: 'bangbangNode' }]
-      await loadFlow(bangbangNode, flow)
-      const n1 = helper.getNode('n1')
+    it('should set proper status with initial state undefined', async function () {
+      await prepareFlow({})
       n1.status.should.be.calledWithExactly({ fill: 'grey', shape: 'dot', text: 'undefined' })
+    })
+
+    it('should set proper status with initial state low', async function () {
+      await prepareFlow({ initialState: 'low' })
+      n1.status.should.be.calledWithExactly({ fill: 'blue', shape: 'dot', text: 'low' })
+    })
+
+    it('should set proper status with initial state high', async function () {
+      await prepareFlow({ initialState: 'high' })
+      n1.status.should.be.calledWithExactly({ fill: 'red', shape: 'dot', text: 'high' })
     })
 
     it('should set proper status on low output', async function () {
