@@ -1,5 +1,8 @@
 # Node-RED Bang-Bang Controller Node
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/blazewicz/node-red-contrib-bang-bang-controller/Node.js%20CI)
+![npm](https://img.shields.io/npm/v/node-red-contrib-bang-bang-controller)
+
 Bang-bang controller (2 step controller, on-off controller, hysteresis controller) is a feedback controller that switches between two states. [1]
 
 Node sends one of two programmed output values on state change.
