@@ -589,6 +589,30 @@ describe('bang-bang node', function () {
       await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout')
     })
 
+    it('should disable output if numeric value is unparseable', async function () {
+      const flow = [
+        {
+          id: 'n1',
+          type: 'bang-bang',
+          name: 'bangbangNode',
+          thresholdUpper: 10,
+          thresholdLower: 8,
+          outputHighType: 'num',
+          outputHigh: 'bug'
+        },
+        { id: 'n2', type: 'helper' }
+      ]
+      await loadFlow(bangbangNode, flow)
+
+      const n1 = helper.getNode('n1')
+      const n2 = helper.getNode('n2')
+
+      n1.error.should.be.calledWithMatch(/Invalid output expression for rising edge.+/)
+
+      n1.should.have.property('valid', false)
+      await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout')
+    })
+
     it('should disable output if JSON expression is invalid', async function () {
       const flow = [
         {

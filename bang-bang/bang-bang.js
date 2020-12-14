@@ -45,8 +45,13 @@ module.exports = function (RED) {
 
     prepareOutput (value, type) {
       switch (type) {
-        case 'num':
-          return Number(value)
+        case 'num': {
+          const val = Number(value)
+          if (isNaN(val)) {
+            throw new Error('not a number')
+          }
+          return val
+        }
         case 'json':
           return JSON.parse(value)
         case 'bin':
