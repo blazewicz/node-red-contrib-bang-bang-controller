@@ -52,12 +52,10 @@ module.exports = function (RED) {
           }
           return val
         }
-        case 'json':
-          return JSON.parse(value)
-        case 'bin':
-          return Buffer.from(JSON.parse(value))
         case 'jsonata':
           return RED.util.prepareJSONataExpression(value, this)
+        case 'json':
+        case 'bin':
         case 'bool':
         case 'env':
           return RED.util.evaluateNodeProperty(value, type, this)
