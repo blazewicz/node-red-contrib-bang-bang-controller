@@ -136,14 +136,15 @@ describe('bang-bang node', function () {
 
     it('should report unparseable input', async function () {
       await prepareFlow({})
-      n1.receive({ payload: 'foo' })
-      const call = await promiseNodeCallback(n1, 'call:error').should.be.resolved()
-      call.should.be.calledWithExactly('Property is not a number')
+      await promiseNodeResponse(n1, n2, { payload: 'foo' }).should.be.rejectedWith('timeout')
+      n1.error.should.be.calledWithExactly('Property is not a number')
     })
 
-    it('should ignore messages without payload', async function () {
+    it('should silently ignore messages without payload property', async function () {
       await prepareFlow({})
       await promiseNodeResponse(n1, n2, { someField: 42 }).should.be.rejectedWith('timeout')
+      n1.error.should.not.be.called()
+      n1.warn.should.not.be.called()
     })
   })
 
@@ -213,9 +214,8 @@ describe('bang-bang node', function () {
 
     it('should report invalid JSONata in threshold', async function () {
       await prepareFlow({ thresholdUpperType: 'jsonata', thresholdUpper: '$.payload +' })
-      n1.receive({ payload: 11 })
-      const call = await promiseNodeCallback(n1, 'call:error').should.be.resolved()
-      call.should.been.calledWithMatch(/Invalid expression used as threshold: .+/)
+      await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout')
+      n1.error.should.be.calledWithMatch(/Invalid expression used as threshold: .+/)
     })
   })
 
@@ -323,9 +323,8 @@ describe('bang-bang node', function () {
 
     it('should warn if output could not be calculated', async function () {
       await prepareFlow({ outputHighType: 'jsonata', outputHigh: '$.payloat + 31' })
-      n1.receive({ payload: 11 })
-      const call = await promiseNodeCallback(n1, 'call:warn').should.be.resolved()
-      call.should.been.calledWithExactly('Output could not be calculated')
+      await promiseNodeResponse(n1, n2, { payload: 11 }).should.be.rejectedWith('timeout')
+      n1.warn.should.be.calledWithExactly('Output could not be calculated')
     })
   })
 
